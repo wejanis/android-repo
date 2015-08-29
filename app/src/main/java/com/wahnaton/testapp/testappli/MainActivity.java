@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-// change to test git
+// change to test git 2.0
 public class MainActivity extends Activity {
 
     @Override

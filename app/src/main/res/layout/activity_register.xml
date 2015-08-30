@@ -1,0 +1,77 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <TextView
+        android:text="Register for a New Account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="10dp"
+        android:textSize="23dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="Name"
+        android:paddingTop="35dp"
+        android:paddingLeft="4dp"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="UserName"
+        android:paddingLeft="4dp"
+        android:paddingTop="25dp"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id = "@+id/etUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="Password"
+        android:paddingLeft="4dp"
+        android:paddingTop="25dp"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id = "@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="Verify Password"
+        android:paddingLeft="4dp"
+        android:paddingTop="25dp"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id = "@+id/etVerifyPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"/>
+
+    <Button
+        android:id="@+id/bRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:layout_marginTop="20dp"/>
+
+
+
+</LinearLayout>

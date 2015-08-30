@@ -22,8 +22,7 @@
         android:id="@+id/etName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
-        />
+        android:paddingBottom="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -50,6 +49,7 @@
         android:id = "@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textPassword"
         android:paddingBottom="10dp"/>
 
     <TextView
@@ -61,6 +61,7 @@
 
     <EditText
         android:id = "@+id/etVerifyPassword"
+        android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"/>

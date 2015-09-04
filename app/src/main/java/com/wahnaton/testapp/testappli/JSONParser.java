@@ -14,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class JSONParser{
 
     // function get json from url
     // by making HTTP POST  method
-    public JSONObject makePostRequest(String url, HashMap<String, String> postDataParams) {
+    public JSONObject makePostRequest(String url, LinkedHashMap<String, String> postDataParams) {
 
         HttpURLConnection urlConnection = null;
         String response ="";
@@ -59,17 +60,20 @@ public class JSONParser{
             urlConnection.setRequestMethod("POST");
             urlConnection.setUseCaches(false);
 
+            String postDataString = getPostDataString(postDataParams);
+            urlConnection.setFixedLengthStreamingMode(postDataString.getBytes().length);
+
             OutputStream os = new BufferedOutputStream(urlConnection.getOutputStream());
             BufferedWriter bw = new BufferedWriter(
                     new OutputStreamWriter(os, "UTF-8"));
-            String postDataString = getPostDataString(postDataParams);
-            urlConnection.setFixedLengthStreamingMode(postDataString.getBytes().length);
             bw.write(postDataString);
             bw.flush();
             bw.close();
             os.close();
 
             int responseCode= urlConnection.getResponseCode();
+            System.out.println("response code: " + responseCode);
+
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String line;
@@ -78,8 +82,9 @@ public class JSONParser{
                     response+=line;
                 }
             }
-            else {
-                response="";
+
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                Log.e("No response", urlConnection.getInputStream().toString());
             }
 
         } catch (Exception e) {
@@ -91,7 +96,9 @@ public class JSONParser{
 
         // try parse the string to a JSON object
         try {
+            System.out.println(response.toString());
             jObj = new JSONObject(response);
+
         } catch (JSONException e) {
             Log.e("JSON Parser", "Error parsing data " + e.toString());
         }
@@ -102,7 +109,8 @@ public class JSONParser{
     }
 
     //Formats the input of makePostRequest
-    private static String getPostDataString(HashMap<String, String> params){
+    private static String getPostDataString(LinkedHashMap<String, String> params){
+
 
         StringBuilder result = new StringBuilder();
         boolean first = true;

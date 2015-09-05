@@ -3,15 +3,18 @@ package com.wahnaton.testapp.testappli;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.LinkedHashMap;
 
@@ -21,9 +24,11 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
     private ProgressDialog registerDialog;
     private static String addUserUrl = "http://192.168.1.9:80/android_connect/addUser.php";
     JSONParser jsonParser = new JSONParser();
+    boolean passwordError, usernameError = false;
 
     Button bRegister;
     EditText etName, etUsername, etPassword, etVerifyPassword;
+    TextView tvPasswordError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +40,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
         etUsername = (EditText) findViewById(R.id.etUsername);
         etPassword = (EditText) findViewById(R.id.etPassword);
         etVerifyPassword = (EditText) findViewById(R.id.etVerifyPassword);
+        tvPasswordError = (TextView) findViewById(R.id.tvPasswordError);
         bRegister.setOnClickListener(this);
     }
 
@@ -56,6 +62,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
             registerDialog.setIndeterminate(false);
             registerDialog.setCancelable(true);
             registerDialog.show();
+            tvPasswordError.setText("");
         }
 
         protected String doInBackground(String... args) {
@@ -84,8 +91,20 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                     // closing this screen
                     finish();
                 } else {
+                    String usernameMessage = json.getString("username_error");
+                    String passwordMessage= json.getString("password_error");
+
+                    if(usernameMessage.equals("Username already exists."))
+                    {
+                        usernameError = true;
+                    }
+
+                    if(passwordMessage.equals("Passwords do not match!"));
+                    {
+                        passwordError = true;
+                    }
                     // failed to create user
-                    Log.e("Failed to create user ", json.toString());
+                    //Log.e("Failed to create user ", json.toString());
 
                 }
             } catch (JSONException e) {
@@ -93,8 +112,23 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
             }
             return null;
         }
-        
+
         protected void onPostExecute(String file_url){
+
+            if (usernameError && passwordError)
+            {
+                tvPasswordError.setText("Username already exists and the passwords do not match!");
+                tvPasswordError.setTextColor(Color.RED);
+            }
+            else if(usernameError)
+            {
+                tvPasswordError.setText("Username already exists!");
+                tvPasswordError.setTextColor(Color.RED);
+            }
+            else if(passwordError){
+                tvPasswordError.setText("Passwords do not match!");
+                tvPasswordError.setTextColor(Color.RED);
+            }
             registerDialog.dismiss();
         }
     }

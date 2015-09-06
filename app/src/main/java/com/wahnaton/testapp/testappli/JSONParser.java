@@ -96,7 +96,7 @@ public class JSONParser{
 
         // try parse the string to a JSON object
         try {
-            System.out.println(response.toString());
+            System.out.println("Response: " + response.toString());
             jObj = new JSONObject(response);
 
         } catch (JSONException e) {
@@ -136,7 +136,6 @@ public class JSONParser{
 
         return result.toString();
     }
-
 
     // function get json from url
     // by making HTTP GET  method

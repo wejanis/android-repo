@@ -111,7 +111,6 @@ public class JSONParser{
     //Formats the input of makePostRequest
     private static String getPostDataString(LinkedHashMap<String, String> params){
 
-
         StringBuilder result = new StringBuilder();
         boolean first = true;
         for(Map.Entry<String, String> entry : params.entrySet())

@@ -87,7 +87,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                 params.put("name", name);
                 params.put("username", username);
                 params.put("password", password);
-                // params.put("verifypassword", verifypassword);
 
                 JSONObject json = jsonParser.makePostRequest(addUserUrl, params);
                 Log.d("Add user response: ", json.toString());

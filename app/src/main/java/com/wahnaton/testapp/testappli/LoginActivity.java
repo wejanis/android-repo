@@ -1,23 +1,35 @@
 package com.wahnaton.testapp.testappli;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
+
+import java.util.LinkedHashMap;
+
 
 public class LoginActivity extends Activity implements View.OnClickListener {
+
+    private ProgressDialog loginDialog;
+    private static String userLoginUrl = "http://192.168.1.9:80/android_connect/userLogin.php";
+    JSONParser jsonParser = new JSONParser();
 
     Button bLogin;
     EditText etUsername;
     EditText etPassword;
     TextView tvRegisterLink;
+    TextView tvInvalidLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +40,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         etPassword = (EditText) findViewById(R.id.etPassword);
         bLogin = (Button) findViewById(R.id.bLogin);
         tvRegisterLink = (TextView) findViewById(R.id.tvResgisterLink);
+        tvInvalidLogin = (TextView) findViewById(R.id.tvInvalidLogin);
 
         bLogin.setOnClickListener(this);
         tvRegisterLink.setOnClickListener(this);
@@ -39,7 +52,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
         switch(v.getId()){
             case R.id.bLogin:
-                startActivity(new Intent(this, MainActivity.class));
+                new ValidateUser().execute();
                 break;
 
             case R.id.tvResgisterLink:
@@ -48,5 +61,90 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         }
 
     }
+
+    class ValidateUser extends AsyncTask<String, String, String> {
+
+        boolean passwordError, usernameError, userNameSizeError, passwordSizeError;
+
+        protected void onPreExecute(){
+            super.onPreExecute();
+            loginDialog = new ProgressDialog(LoginActivity.this);
+            loginDialog.setMessage("Loading account..");
+            loginDialog.setIndeterminate(false);
+            loginDialog.setCancelable(true);
+            loginDialog.show();
+
+            tvInvalidLogin.setText("");
+        }
+
+        protected String doInBackground(String... args) {
+            passwordError= false;
+            usernameError = false;
+            userNameSizeError = false;
+            passwordSizeError = false;
+            String username = etUsername.getText().toString();
+            String password = etPassword.getText().toString();
+
+            if(username.length() < 1)
+                userNameSizeError = true;
+            else if(password.length() < 6)
+                passwordSizeError = true;
+            else {
+                LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+                params.put("username", username);
+                params.put("password", password);
+
+                JSONObject json = jsonParser.makePostRequest(userLoginUrl, params);
+                //Log.d("JSON Parser", json.toString());
+
+                // check for success tag
+                try {
+                    int success = json.getInt("success");
+                    if (success == 1) {
+                        // successfully created user
+                        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(i);
+
+                        // closing this screen
+                        finish();
+                    } else {
+                        String usernameMessage = json.getString("username_error");
+                        String passwordMessage = json.getString("password_error");
+                        if (usernameMessage.equals("Username does not exist"))
+                            usernameError = true;
+                        if (passwordMessage.equals("Incorrect password"))
+                            passwordError = true;
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
+
+        protected void onPostExecute(String file_url){
+
+            if (userNameSizeError)
+            {
+                tvInvalidLogin.setText("Please enter a username!");
+                tvInvalidLogin.setTextColor(Color.RED);
+            }
+            else if(passwordSizeError)
+            {
+                tvInvalidLogin.setText("Passwords must be at least 6 characters.");
+                tvInvalidLogin.setTextColor(Color.RED);
+            }
+            else if(usernameError || passwordError)
+            {
+                tvInvalidLogin.setText("The username and password you entered did not match our records. Please try again.");
+                tvInvalidLogin.setTextColor(Color.RED);
+            }
+            loginDialog.dismiss();
+        }
+    }
+
+
 
 }

@@ -6,15 +6,14 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.LinkedHashMap;
 
@@ -23,13 +22,17 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private ProgressDialog loginDialog;
     private static String userLoginUrl = "http://192.168.1.9:80/android_connect/userLogin.php";
-    JSONParser jsonParser = new JSONParser();
+    private String rememberLogin;
 
-    Button bLogin;
-    EditText etUsername;
-    EditText etPassword;
-    TextView tvRegisterLink;
-    TextView tvInvalidLogin;
+    private JSONParser jsonParser = new JSONParser();
+    private SecurePreferences loginPrefs;
+
+    private Button bLogin;
+    private EditText etUsername;
+    private EditText etPassword;
+    private TextView tvRegisterLink;
+    private TextView tvInvalidLogin;
+    private CheckBox cbRememberLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +44,27 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         bLogin = (Button) findViewById(R.id.bLogin);
         tvRegisterLink = (TextView) findViewById(R.id.tvResgisterLink);
         tvInvalidLogin = (TextView) findViewById(R.id.tvInvalidLogin);
+        cbRememberLogin = (CheckBox) findViewById(R.id.cbRememberLogin);
+        loginPrefs = new SecurePreferences(this, "user-info", "randomTestingPurposesKey", true);
+
+        rememberLogin = loginPrefs.getString("rememberLogin");
+
+        //Kind of weird due to how Secured preferences works.
+        //Shared preferences has getBoolean which has a parameter for returning a value should the value return null.
+        //May need to modify SecuredPreferences to add a similar behavior.
+        if(rememberLogin == null)
+        {
+            loginPrefs.put("rememberLogin", "false");
+            etUsername.setText("");
+            etPassword.setText("");
+            cbRememberLogin.setChecked(false);
+        }
+        else if(rememberLogin.equals("true")){
+            etUsername.setText(loginPrefs.getString("username"));
+            etPassword.setText(loginPrefs.getString("password"));
+            cbRememberLogin.setChecked(true);
+        }
+
 
         bLogin.setOnClickListener(this);
         tvRegisterLink.setOnClickListener(this);
@@ -101,10 +125,20 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 try {
                     int success = json.getInt("success");
                     if (success == 1) {
+
+                        if(cbRememberLogin.isChecked()) {
+                            loginPrefs.put("rememberLogin", "true");
+                            loginPrefs.put("username", username);
+                            loginPrefs.put("password", password);
+                        }
+                        else{
+                            loginPrefs.clear();
+                            loginPrefs.put("rememberLogin", "false");
+                        }
+
                         // successfully created user
                         Intent i = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(i);
-
                         // closing this screen
                         finish();
                     } else {

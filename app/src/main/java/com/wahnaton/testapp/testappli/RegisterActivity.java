@@ -98,7 +98,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                         // successfully created user
                         Intent i = new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(i);
-
                         // closing this screen
                         finish();
                     } else {

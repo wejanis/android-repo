@@ -2,6 +2,7 @@ package com.wahnaton.testapp.testappli;
 
 import android.app.ActionBar;
 import android.app.ActivityOptions;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,16 +11,24 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 import static com.wahnaton.testapp.testappli.R.menu.menu_main;
 
 // change to test git 2.0
 public class MainActivity extends AppCompatActivity /*implements View.OnClickListener*/ {
 
-   // Button bLogout;
-    EditText etName, etUsername;
     private SecurePreferences loginPrefs;
+    private TextView tvDate;
+    private Calendar myCalendar;
+
+    private DatePickerDialog.OnDateSetListener date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +45,26 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
 
         loginPrefs = new SecurePreferences(this, "user-info", "randomTestingPurposesKey", true);
 
-        etName = (EditText) findViewById(R.id.etName);
-        etUsername = (EditText) findViewById(R.id.etUsername);
+        tvDate = (TextView) findViewById(R.id.tvDate);
 
         String username = loginPrefs.getString("username");
-        etUsername.setText(username);
+        setTitle("Welcome, " + username + "!");
+
+        String myFormat = "MM/dd/yy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        tvDate.setText(sdf.format(Calendar.getInstance().getTime()));
+
+
+        myCalendar = Calendar.getInstance();
+        date = new DatePickerDialog.OnDateSetListener() {
+          public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+          {
+              myCalendar.set(Calendar.YEAR, year);
+              myCalendar.set(Calendar.MONTH, monthOfYear);
+              myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+              updateLabel();
+          }
+        };
 
     }
 
@@ -66,12 +90,27 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                 //startActivity(intent);
                 //finish();
                 return true;
+            case R.id.action_pickdate:
 
+                new DatePickerDialog(this, date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
 
         }
 
     }
+
+
+    private void updateLabel() {
+
+        String myFormat = "MM/dd/yy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+
+        tvDate.setText(sdf.format(myCalendar.getTime()));
+    }
+
+
 
 }

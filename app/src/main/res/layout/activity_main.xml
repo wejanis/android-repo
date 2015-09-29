@@ -4,14 +4,36 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <TextView
-        android:id="@+id/tvDate"
+   <android.support.v7.widget.Toolbar
+        android:id="@+id/toolBarTop"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="?attr/actionBarSize">
+
+
+    <TextView style="?android:textAppearanceMedium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Text"
-        android:layout_gravity="center_horizontal"
+        android:text="Workouts"
+        android:layout_gravity="center"
         android:layout_marginTop="15dp"
         android:textStyle="bold"
         />
+
+    </android.support.v7.widget.Toolbar>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/mPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <android.support.v4.view.PagerTitleStrip
+            android:id="@+id/tsPager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            />
+
+    </android.support.v4.view.ViewPager>
 
 </LinearLayout>

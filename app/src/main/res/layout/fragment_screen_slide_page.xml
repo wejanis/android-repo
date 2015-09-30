@@ -1,14 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/content"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/transparent"
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="#CCCCCC"
+        android:dividerHeight="1dp"
+        android:paddingLeft="2dp" >
+    </ListView>
 
     <TextView style="?android:textAppearanceMedium"
-        android:padding="16dp"
-        android:lineSpacingMultiplier="1.2"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:text="No Workouts Logged"
+        android:layout_centerInParent="true"
+        android:id="@android:id/empty"/>
+
+    <ImageView android:src='@drawable/ic_add_black'
+        android:layout_below="@android:id/empty"
+        android:layout_centerInParent="true"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:id="@+id/iv"
+        android:clickable="true"/>
+    <TextView android:text="Add Exercise"
+        android:layout_below="@+id/iv"
+        android:layout_centerInParent="true"
         android:layout_height="wrap_content"
-        android:text="Temp Text"
-        android:id="@+id/tvTempText"/>
-</ScrollView>
+        android:layout_width="wrap_content" />
+
+
+</RelativeLayout>

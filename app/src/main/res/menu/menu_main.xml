@@ -26,5 +26,4 @@
         app:showAsAction="always"
         android:orderInCategory="300"/>
 
-
 </menu>

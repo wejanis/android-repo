@@ -11,12 +11,10 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.DatePicker;
 
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -25,10 +23,7 @@ import hirondelle.date4j.DateTime;
 public class MainActivity extends AppCompatActivity {
 
     private SecurePreferences loginPrefs;
-    //private TextView tvDate;
-    //private Calendar myCalendar;
     private DateTime datePicked;
-    private Toolbar toolBarTop;
     private ViewPager mPager;
     private int numDays;
     private DatePickerDialog.OnDateSetListener date;
@@ -50,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
         loginPrefs = new SecurePreferences(this, "user-info", "randomTestingPurposesKey", true);
 
-        toolBarTop = (Toolbar) findViewById(R.id.toolBarTop);
-        //tvDate = (TextView) toolBarTop.findViewById(R.id.tvDate);
         mPager = (ViewPager) findViewById(R.id.mPager);
         pts = (PagerTitleStrip) findViewById(R.id.tsPager);
         mPager.setAdapter(new ScreenSlidePagerAdapter(getResources(), getSupportFragmentManager()));
@@ -61,13 +54,10 @@ public class MainActivity extends AppCompatActivity {
         mPager.setOffscreenPageLimit(0);
         pts.setNonPrimaryAlpha(0);
 
-
-
+        //TODO: Needs to be changed to use server username no preferences.
+        //TODO: Currently only works when "Remember Me" checkbox is selected.
         String username = loginPrefs.getString("username");
         setTitle("Welcome, " + username + "!");
-
-        final String myFormat = "MM/dd/yy";
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
         datePicked = DateTime.now(TimeZone.getDefault());
         numDays = mPager.getCurrentItem() - (NUM_PAGES/2);
@@ -76,30 +66,20 @@ public class MainActivity extends AppCompatActivity {
           public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
           {
               numDays = mPager.getCurrentItem() - (NUM_PAGES/2);
-              System.out.println("original numdays: " + 0);
+              System.out.println("position has been moved by " + numDays + " days");
 
               //DatePicker indexes the months from 0 (Jan.) - 11 (Dec.) so need to add one to the month parameter.
               datePicked = DateTime.forDateOnly(year, monthOfYear + 1, dayOfMonth);
               System.out.println("datePicked: " + datePicked.toString() + "------------------------------------------");
 
 
-              DateTime dt = DateTime.now(TimeZone.getDefault());  // dt = 9/27
-              System.out.println("dt before day adjustment: " + dt.toString() + "------------------------------------------");
+              DateTime dt = DateTime.now(TimeZone.getDefault());
+              System.out.println("dt before day adjustment (should be today's date): " + dt.toString() + "------------------------------------------");
 
-              if(numDays < 0) {
-                  System.out.println("current pos numdays from today < 0:" + numDays);
-                  dt = dt.minusDays(numDays); //
-              }
-              else if (numDays > 0) {
-                  dt = dt.plusDays(numDays); // dt = 9/29
-                  System.out.println("current pos numdays from today > 0:" + numDays);
-              }
-              else{
-                  System.out.println("current pos numdays from today = 0: " + numDays);
-              }
+              dt = dt.plusDays(numDays);
 
 
-              System.out.println("dt after day adjustment: " + dt.toString() + "------------------------------------------");
+              System.out.println("dt should now be the date that the screen was on before datepicker was clicked " + dt.toString() + "------------------------------------------");
               int num = dt.numDaysFrom(datePicked);
               System.out.println("dt num days from datepicked: " + num + "------------------------------------------");
               mPager.setCurrentItem(mPager.getCurrentItem() + num);
@@ -143,18 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-        if (mPager.getCurrentItem() == 0) {
-            // If the user is currently looking at the first step, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
-            super.onBackPressed();
-        } else {
-            // Otherwise, select the previous step.
-            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
-        }
-    }
-
     private class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
         public ScreenSlidePagerAdapter(Resources resources, FragmentManager fm) {
             super(fm);
@@ -186,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
             else if (position - (NUM_PAGES/2) == -1)
                 cs = "Yesterday";
             else
-                cs = days.format("WWWW, MM/DD/YYYY", Locale.getDefault()).toString();
+                cs = days.format("WWW, MM/DD/YYYY", Locale.getDefault()).toString();
 
             return cs;
         }

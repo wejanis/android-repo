@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private DatePickerDialog.OnDateSetListener date;
     private static int NUM_PAGES = 5000;
     private PagerTitleStrip pts;
+    private DatePickerDialog dpd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,33 +61,40 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Welcome, " + username + "!");
 
         datePicked = DateTime.now(TimeZone.getDefault());
-        numDays = mPager.getCurrentItem() - (NUM_PAGES/2);
+
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                DateTime pagerdate = DateTime.now(TimeZone.getDefault());
+                datePicked = pagerdate.plusDays(position - (NUM_PAGES/2));
+
+            }
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
 
         date = new DatePickerDialog.OnDateSetListener() {
           public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
           {
-              numDays = mPager.getCurrentItem() - (NUM_PAGES/2);
-              System.out.println("position has been moved by " + numDays + " days");
+
+             // numDays = mPager.getCurrentItem() - (NUM_PAGES/2); //How much the screen has changed from the startup date of TODAY
+              DateTime oldDate = datePicked;
+              //datePicked = datePicked.plusDays(numDays); //Gets the date the screen showed before the datepicker was clicked
 
               //DatePicker indexes the months from 0 (Jan.) - 11 (Dec.) so need to add one to the month parameter.
-              datePicked = DateTime.forDateOnly(year, monthOfYear + 1, dayOfMonth);
-              System.out.println("datePicked: " + datePicked.toString() + "------------------------------------------");
-
-
-              DateTime dt = DateTime.now(TimeZone.getDefault());
-              System.out.println("dt before day adjustment (should be today's date): " + dt.toString() + "------------------------------------------");
-
-              dt = dt.plusDays(numDays);
-
-
-              System.out.println("dt should now be the date that the screen was on before datepicker was clicked " + dt.toString() + "------------------------------------------");
-              int num = dt.numDaysFrom(datePicked);
+              datePicked = DateTime.forDateOnly(year, monthOfYear + 1, dayOfMonth); //System.out.println("datePicked: " + datePicked.toString() + "------------------------------------------");
+              int num = oldDate.numDaysFrom(datePicked);
               System.out.println("dt num days from datepicked: " + num + "------------------------------------------");
               mPager.setCurrentItem(mPager.getCurrentItem() + num);
               System.out.println("currPos: " + mPager.getCurrentItem() + "------------------------------------------");
           }
         };
-
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -112,9 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 //finish();
                 return true;
             case R.id.action_pickdate:
-
                 new DatePickerDialog(this, date, datePicked.getYear(), datePicked.getMonth()-1, datePicked.getDay()).show();
-
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

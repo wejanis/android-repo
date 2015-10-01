@@ -23,7 +23,7 @@ import hirondelle.date4j.DateTime;
 public class MainActivity extends AppCompatActivity {
 
     private SecurePreferences loginPrefs;
-    private DateTime datePicked;
+    private DateTime currentDay;
     private ViewPager mPager;
     private int numDays;
     private DatePickerDialog.OnDateSetListener date;
@@ -60,15 +60,14 @@ public class MainActivity extends AppCompatActivity {
         String username = loginPrefs.getString("username");
         setTitle("Welcome, " + username + "!");
 
-        datePicked = DateTime.now(TimeZone.getDefault());
+        currentDay = DateTime.now(TimeZone.getDefault());
 
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
                 DateTime pagerdate = DateTime.now(TimeZone.getDefault());
-                datePicked = pagerdate.plusDays(position - (NUM_PAGES/2));
-
+                currentDay = pagerdate.plusDays(position - (NUM_PAGES/2));
             }
             @Override
             public void onPageSelected(int position) {
@@ -82,17 +81,11 @@ public class MainActivity extends AppCompatActivity {
         date = new DatePickerDialog.OnDateSetListener() {
           public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
           {
-
-             // numDays = mPager.getCurrentItem() - (NUM_PAGES/2); //How much the screen has changed from the startup date of TODAY
-              DateTime oldDate = datePicked;
-              //datePicked = datePicked.plusDays(numDays); //Gets the date the screen showed before the datepicker was clicked
-
-              //DatePicker indexes the months from 0 (Jan.) - 11 (Dec.) so need to add one to the month parameter.
-              datePicked = DateTime.forDateOnly(year, monthOfYear + 1, dayOfMonth); //System.out.println("datePicked: " + datePicked.toString() + "------------------------------------------");
-              int num = oldDate.numDaysFrom(datePicked);
-              System.out.println("dt num days from datepicked: " + num + "------------------------------------------");
-              mPager.setCurrentItem(mPager.getCurrentItem() + num);
-              System.out.println("currPos: " + mPager.getCurrentItem() + "------------------------------------------");
+              DateTime oldDate = currentDay;
+              DateTime datePicked = DateTime.forDateOnly(year, monthOfYear + 1, dayOfMonth);
+              int numDaysFromNewDate = oldDate.numDaysFrom(datePicked);
+              currentDay = datePicked;
+              mPager.setCurrentItem(mPager.getCurrentItem() + numDaysFromNewDate);
           }
         };
     }
@@ -120,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 //finish();
                 return true;
             case R.id.action_pickdate:
-                new DatePickerDialog(this, date, datePicked.getYear(), datePicked.getMonth()-1, datePicked.getDay()).show();
+                new DatePickerDialog(this, date, currentDay.getYear(), currentDay.getMonth()-1, currentDay.getDay()).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

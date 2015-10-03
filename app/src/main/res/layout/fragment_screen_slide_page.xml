@@ -29,10 +29,11 @@
         android:layout_centerInParent="true"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:id="@+id/iv"
+        android:id="@+id/ivAddExercise"
         android:clickable="true"/>
+
     <TextView android:text="Add Exercise"
-        android:layout_below="@+id/iv"
+        android:layout_below="@+id/ivAddExercise"
         android:layout_centerInParent="true"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content" />

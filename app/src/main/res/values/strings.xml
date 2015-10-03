@@ -4,4 +4,7 @@
     <string name="action_logout">Logout</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_add_exercise">AddExerciseActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

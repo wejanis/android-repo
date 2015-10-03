@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
@@ -20,18 +19,15 @@ import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private SecurePreferences loginPrefs;
     private DateTime currentDay;
     private ViewPager mPager;
-    private int numDays;
     private DatePickerDialog.OnDateSetListener date;
     private static int NUM_PAGES = 5000;
     private PagerTitleStrip pts;
-    private DatePickerDialog dpd;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -50,10 +46,10 @@ public class MainActivity extends AppCompatActivity {
         pts = (PagerTitleStrip) findViewById(R.id.tsPager);
         mPager.setAdapter(new ScreenSlidePagerAdapter(getResources(), getSupportFragmentManager()));
         mPager.setCurrentItem(NUM_PAGES / 2, false);
-
         mPager.getAdapter().notifyDataSetChanged();
         mPager.setOffscreenPageLimit(0);
         pts.setNonPrimaryAlpha(0);
+
 
         //TODO: Needs to be changed to use server username no preferences.
         //TODO: Currently only works when "Remember Me" checkbox is selected.
@@ -67,12 +63,14 @@ public class MainActivity extends AppCompatActivity {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
                 DateTime pagerdate = DateTime.now(TimeZone.getDefault());
-                currentDay = pagerdate.plusDays(position - (NUM_PAGES/2));
+                currentDay = pagerdate.plusDays(position - (NUM_PAGES / 2));
             }
+
             @Override
             public void onPageSelected(int position) {
 
             }
+
             @Override
             public void onPageScrollStateChanged(int state) {
             }
@@ -88,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
               mPager.setCurrentItem(mPager.getCurrentItem() + numDaysFromNewDate);
           }
         };
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -122,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         public ScreenSlidePagerAdapter(Resources resources, FragmentManager fm) {
             super(fm);
         }

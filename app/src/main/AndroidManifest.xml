@@ -28,7 +28,8 @@
         </activity>
         <activity
             android:name=".AddExerciseActivity"
-            android:label="@string/title_activity_add_exercise" >
+            android:label="@string/title_activity_add_exercise"
+            android:windowSoftInputMode="stateHidden">
         </activity>
     </application>
 

@@ -1,5 +1,10 @@
 package com.wahnaton.testapp.testappli;
 
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -15,10 +20,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.util.Log;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -47,7 +48,7 @@ public class JSONParser{
             urlConnection.setRequestMethod("POST");
             urlConnection.setUseCaches(false);
 
-            String postDataString = getPostDataString(postDataParams);
+            String postDataString = formatRequestString(postDataParams);
             urlConnection.setFixedLengthStreamingMode(postDataString.getBytes().length);
 
             OutputStream os = new BufferedOutputStream(urlConnection.getOutputStream());
@@ -95,8 +96,8 @@ public class JSONParser{
 
     }
 
-    //Formats the input of makePostRequest
-    private static String getPostDataString(LinkedHashMap<String, String> params){
+    //Formats and encodes the string for the GET/POST request
+    private static String formatRequestString(LinkedHashMap<String, String> params){
 
         StringBuilder result = new StringBuilder();
         boolean first = true;
@@ -125,7 +126,7 @@ public class JSONParser{
 
     // function get json from url
     // by making HTTP GET  method
-    public JSONObject makeGetRequest(String url) {
+    public JSONObject makeGetRequest(String url, LinkedHashMap<String, String> getDataParams) { //data params for the GET request
 
         JSONObject jObj = null;
         String json = "";
@@ -133,6 +134,10 @@ public class JSONParser{
 
         //make HTTP request using GET method
         try {
+
+            url = url + "?" + formatRequestString(getDataParams);
+            System.out.println("GET string: " + url);
+
             URL _url = new URL(url);
             urlConnection = (HttpURLConnection) _url.openConnection();
             urlConnection.setDoInput(true);
@@ -141,6 +146,7 @@ public class JSONParser{
             urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             urlConnection.setRequestMethod("GET");
             urlConnection.setUseCaches(true);
+
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             InputStreamReader isw = new InputStreamReader(in);
 

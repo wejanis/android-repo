@@ -33,8 +33,6 @@ public class ScreenSlidePageFragment extends Fragment implements View.OnClickLis
                 startActivity(new Intent(v.getContext(), AddExerciseActivity.class));
                 break;
 
-
-
         }
 
     }

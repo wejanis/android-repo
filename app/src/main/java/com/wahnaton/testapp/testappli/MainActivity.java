@@ -30,9 +30,11 @@ public class MainActivity extends AppCompatActivity{
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
 
+        //Used when logging out from a page besides the main page. The logout of another page
+        //will clear the activity stack until reaching main and set the "finish" extra to true.
+        //Then the main activity will send the user to the login screen and finish.
         boolean finish = getIntent().getBooleanExtra("finish", false);
         if (finish) {
             startActivity(new Intent(this, LoginActivity.class));
@@ -50,10 +52,8 @@ public class MainActivity extends AppCompatActivity{
         mPager.setOffscreenPageLimit(0);
         pts.setNonPrimaryAlpha(0);
 
-
-        //TODO: Needs to be changed to use server username no preferences.
-        //TODO: Currently only works when "Remember Me" checkbox is selected.
-        String username = loginPrefs.getString("username");
+        Intent intent = getIntent();
+        String username = intent.getStringExtra("username");
         setTitle("Welcome, " + username + "!");
 
         currentDay = DateTime.now(TimeZone.getDefault());
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity{
             CharSequence cs;
 
             DateTime pagerdate = DateTime.now(TimeZone.getDefault());
-            DateTime days = pagerdate.plusDays(position - (NUM_PAGES/2));
+            DateTime days = pagerdate.plusDays(position - (NUM_PAGES / 2));
 
             if(position - (NUM_PAGES/2) == 0)
                 cs = "Today";

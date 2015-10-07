@@ -138,6 +138,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
                         // successfully created user
                         Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                        i.putExtra("username", username);
                         startActivity(i);
                         // closing this screen
                         finish();

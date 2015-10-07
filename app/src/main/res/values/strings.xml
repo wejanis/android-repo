@@ -7,4 +7,5 @@
     <string name="title_activity_add_exercise">AddExerciseActivity</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_exercise_info">ExerciseInfoActivity</string>
 </resources>

@@ -1,7 +1,9 @@
 package com.wahnaton.testapp.testappli;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,6 +24,7 @@ import hirondelle.date4j.DateTime;
 public class MainActivity extends AppCompatActivity{
 
     private SecurePreferences loginPrefs;
+    private SharedPreferences datePref;
     private DateTime currentDay;
     private ViewPager mPager;
     private DatePickerDialog.OnDateSetListener date;
@@ -43,13 +46,17 @@ public class MainActivity extends AppCompatActivity{
         }
 
         loginPrefs = new SecurePreferences(this, "user-info", "randomTestingPurposesKey", true);
+        datePref = getSharedPreferences("date-pref", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = datePref.edit();
+        editor.clear();
+        editor.commit();
 
         mPager = (ViewPager) findViewById(R.id.mPager);
         pts = (PagerTitleStrip) findViewById(R.id.tsPager);
         mPager.setAdapter(new ScreenSlidePagerAdapter(getResources(), getSupportFragmentManager()));
         mPager.setCurrentItem(NUM_PAGES / 2, false);
         mPager.getAdapter().notifyDataSetChanged();
-        mPager.setOffscreenPageLimit(0);
+        mPager.setOffscreenPageLimit(1);
         pts.setNonPrimaryAlpha(0);
 
         Intent intent = getIntent();
@@ -61,19 +68,22 @@ public class MainActivity extends AppCompatActivity{
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
                 DateTime pagerdate = DateTime.now(TimeZone.getDefault());
                 currentDay = pagerdate.plusDays(position - (NUM_PAGES / 2));
+
+                //format for storage in DATE field in database (which stores dates as YYYY-MM-DD)
+                String currDate = currentDay.format("YYYY-MM-DD", Locale.getDefault()).toString();
+                SharedPreferences.Editor editor = datePref.edit();
+                editor.putString("currDate", currDate);
+                editor.commit();
+
             }
 
             @Override
-            public void onPageSelected(int position) {
-
-            }
+            public void onPageSelected(int position) {}
 
             @Override
-            public void onPageScrollStateChanged(int state) {
-            }
+            public void onPageScrollStateChanged(int state) {}
         });
 
         date = new DatePickerDialog.OnDateSetListener() {
@@ -84,6 +94,13 @@ public class MainActivity extends AppCompatActivity{
               int numDaysFromNewDate = oldDate.numDaysFrom(datePicked);
               currentDay = datePicked;
               mPager.setCurrentItem(mPager.getCurrentItem() + numDaysFromNewDate);
+
+              //format for storage in DATE field in database (which stores dates as YYYY-MM-DD)
+              String currDate = currentDay.format("YYYY-MM-DD", Locale.getDefault()).toString();
+              SharedPreferences.Editor editor = datePref.edit();
+              editor.putString("currDate", currDate);
+              editor.commit();
+
           }
         };
 
@@ -122,6 +139,9 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+
+        DateTime date;
+
         public ScreenSlidePagerAdapter(Resources resources, FragmentManager fm) {
             super(fm);
         }
@@ -132,9 +152,7 @@ public class MainActivity extends AppCompatActivity{
 
         public Fragment getItem(int position){
 
-            ScreenSlidePageFragment sspFragment = new ScreenSlidePageFragment();
-
-            return sspFragment;
+            return new ScreenSlidePageFragment().newInstance(date);
         }
 
         @Override
@@ -143,7 +161,8 @@ public class MainActivity extends AppCompatActivity{
             CharSequence cs;
 
             DateTime pagerdate = DateTime.now(TimeZone.getDefault());
-            DateTime days = pagerdate.plusDays(position - (NUM_PAGES / 2));
+            int days = position - (NUM_PAGES / 2);
+            date = pagerdate.plusDays(days);
 
             if(position - (NUM_PAGES/2) == 0)
                 cs = "Today";
@@ -152,7 +171,7 @@ public class MainActivity extends AppCompatActivity{
             else if (position - (NUM_PAGES/2) == -1)
                 cs = "Yesterday";
             else
-                cs = days.format("WWW, MM/DD/YYYY", Locale.getDefault()).toString();
+                cs = date.format("WWW, MM/DD/YYYY", Locale.getDefault()).toString();
 
             return cs;
         }

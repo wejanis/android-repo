@@ -8,9 +8,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import hirondelle.date4j.DateTime;
+
 public class ScreenSlidePageFragment extends Fragment implements View.OnClickListener{
 
     private ImageView ivAddExercise;
+    private DateTime currDate;
+
+    static ScreenSlidePageFragment newInstance(DateTime date)
+    {
+        ScreenSlidePageFragment f = new ScreenSlidePageFragment();
+
+        //Give item date as an argument
+        Bundle args = new Bundle();
+        args.putInt("currDateYear", date.getYear());
+        args.putInt("currDateMonth", date.getMonth());
+        args.putInt("currDateDay", date.getDay());
+        f.setArguments(args);
+
+        return f;
+    }
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -18,8 +36,13 @@ public class ScreenSlidePageFragment extends Fragment implements View.OnClickLis
                 R.layout.fragment_screen_slide_page, container, false);
 
         ivAddExercise = (ImageView) rootView.findViewById(R.id.ivAddExercise);
-
         ivAddExercise.setOnClickListener(this);
+
+        int year = getArguments().getInt("currDateYear");
+        int month = getArguments().getInt("currDateMonth");
+        int day = getArguments().getInt("currDateDay");
+
+        currDate = DateTime.forDateOnly(year, month, day);
 
         return rootView;
     }
@@ -30,7 +53,9 @@ public class ScreenSlidePageFragment extends Fragment implements View.OnClickLis
         switch (v.getId()){
 
             case R.id.ivAddExercise:
-                startActivity(new Intent(v.getContext(), AddExerciseActivity.class));
+                Intent i = new Intent(v.getContext(), AddExerciseActivity.class);
+                i.putExtra("currDate", currDate);
+                startActivity(i);
                 break;
 
         }

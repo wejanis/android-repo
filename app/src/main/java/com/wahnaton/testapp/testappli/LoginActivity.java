@@ -126,23 +126,26 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     int success = json.getInt("success");
                     if (success == 1) {
 
-                        if(cbRememberLogin.isChecked()) {
+                        loginPrefs.put("username", username);
+                        loginPrefs.put("password", password);
+                        if(cbRememberLogin.isChecked())
                             loginPrefs.put("rememberLogin", "true");
-                            loginPrefs.put("username", username);
-                            loginPrefs.put("password", password);
-                        }
-                        else{
-                            loginPrefs.clear();
+                        else
+                            //dont clear preferences here because the username is used throughout the app
+                            //credentials are cleared upon logout
+                            //instead keep track that the user wants the credentials removed upon logout
+                            //and make sure to do loginPrefs.clear() in any logout method.
                             loginPrefs.put("rememberLogin", "false");
-                        }
 
                         // successfully created user
                         Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                        i.putExtra("username", username);
+                        //i.putExtra("username", username);
                         startActivity(i);
                         // closing this screen
                         finish();
-                    } else {
+                    }
+
+                    else {
                         String usernameMessage = json.getString("username_error");
                         String passwordMessage = json.getString("password_error");
                         if (usernameMessage.equals("Username does not exist"))

@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -27,11 +28,13 @@ public class ExerciseInfoActivity extends AppCompatActivity {
     private EditText etWeight, etReps;
     private ProgressDialog saveExerciseDialog;
     private TextView warningMessage;
+    private CheckBox cbExerciseComplete;
 
     private JSONParser jsonParser;
+    private SecurePreferences loginPrefs;
 
     private double weight, reps;
-    private String currDate, exerciseName, isExerciseComplete;
+    private String currDate, exerciseName, username;
     private static String insertExerciseInfoUrl = "http://192.168.1.9:80/android_connect/insertExerciseInfo.php";
 
     @Override
@@ -39,11 +42,11 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise_info);
 
-        isExerciseComplete = "false";
-
-
         Intent intent = getIntent();
         exerciseName = intent.getStringExtra("exercise");
+
+        loginPrefs = new SecurePreferences(this, "user-info", "randomTestingPurposesKey", true);
+        username = loginPrefs.getString("username");
 
         SharedPreferences datePref = getSharedPreferences("date-pref", Context.MODE_PRIVATE);
         currDate = datePref.getString("currDate", "Date not found.");
@@ -53,6 +56,10 @@ public class ExerciseInfoActivity extends AppCompatActivity {
 
         weight = 0;
         reps = 0;
+
+        cbExerciseComplete = (CheckBox) findViewById(R.id.cbExerciseComplete);
+        cbExerciseComplete.setTextColor(Color.DKGRAY);
+        cbExerciseComplete.setChecked(false);
 
         warningMessage = (TextView) findViewById(R.id.tvWarningMessage);
         warningMessage.setTextColor(Color.RED);
@@ -89,7 +96,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         bPlusReps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reps += 5;
+                reps += 1;
                 etReps.setText(""+reps);
             }
         });
@@ -98,7 +105,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         bMinusReps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reps -= 5;
+                reps -= 1;
                 if(reps < 0)
                     reps = 0;
                 etReps.setText(""+reps);
@@ -113,6 +120,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
                 reps = 0;
                 etWeight.setText("");
                 etReps.setText("");
+                cbExerciseComplete.setChecked(false);
             }
         });
 
@@ -175,12 +183,18 @@ public class ExerciseInfoActivity extends AppCompatActivity {
             if(etWeight.equals("") || etReps.equals("") || weight == 0 || reps == 0)
                 emptyFieldError = true;
             else {
+
+                String isExerciseComplete = "false";
+                if(cbExerciseComplete.isChecked())
+                    isExerciseComplete = "true";
+
                 LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
                 params.put("exercise_name", exerciseName);
                 params.put("weight", "" + weight);
                 params.put("reps", "" + reps);
                 params.put("exercise_complete", isExerciseComplete);
                 params.put("date", currDate);
+                params.put("username", username);
                 System.out.println(params.toString());
 
                 JSONObject json = jsonParser.makePostRequest(insertExerciseInfoUrl, params);

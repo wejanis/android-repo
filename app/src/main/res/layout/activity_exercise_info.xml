@@ -82,7 +82,7 @@
             android:text=""
             android:textSize="30dp"
             android:gravity="center"
-            android:inputType="numberDecimal"
+            android:inputType="number"
             />
 
         <Button
@@ -94,6 +94,18 @@
             android:textSize="40sp"/>
 
     </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/cbExerciseComplete"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Exercise complete"
+        android:textSize="20dp"
+        android:paddingLeft="5dp"
+        android:textStyle="normal"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"

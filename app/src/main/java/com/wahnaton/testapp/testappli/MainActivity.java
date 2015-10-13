@@ -57,10 +57,12 @@ public class MainActivity extends AppCompatActivity{
         mPager.setCurrentItem(NUM_PAGES / 2, false);
         mPager.getAdapter().notifyDataSetChanged();
         mPager.setOffscreenPageLimit(1);
+
+        //Pagertitle strip by default shows the title of the previous fragment, the current fragment, and the next fragment
+        //This setting causes only the primary fragment's title to be shown (aka shows only "Today" instead of "Yesterday     Today    Tomorrow"
         pts.setNonPrimaryAlpha(0);
 
-        Intent intent = getIntent();
-        String username = intent.getStringExtra("username");
+        String username = loginPrefs.getString("username");
         setTitle("Welcome, " + username + "!");
 
         currentDay = DateTime.now(TimeZone.getDefault());
@@ -120,6 +122,12 @@ public class MainActivity extends AppCompatActivity{
                 return true;
             case R.id.action_logout:
                 startActivity(new Intent(this, LoginActivity.class));
+
+                //Clear the login credentials of the user since they didn't select "remember login"
+                String rememberLogin = loginPrefs.getString("rememberLogin");
+                if(rememberLogin.equals("false"))
+                    loginPrefs.clear();
+
                 finish();
                 //Activities aside from MainActivity need:
                 //Intent intent = new Intent(this, HomeActivity.class);
@@ -180,6 +188,13 @@ public class MainActivity extends AppCompatActivity{
         public int getCount() {
             return NUM_PAGES;
         }
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        String rememberLogin = loginPrefs.getString("rememberLogin");
+        if(rememberLogin.equals("false"))
+            loginPrefs.clear();
     }
 
 

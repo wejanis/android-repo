@@ -24,8 +24,8 @@ import java.util.LinkedHashMap;
 
 public class ExerciseInfoActivity extends AppCompatActivity {
 
-    private Button bSaveExercise, bPlusWeight, bMinusWeight, bPlusReps, bMinusReps, bClearExerciseInput;
-    private EditText etWeight, etReps;
+    private Button bSaveExercise, bPlusWeight, bMinusWeight, bPlusReps, bMinusReps, bPlusSets, bMinusSets, bClearExerciseInput;
+    private EditText etWeight, etReps, etSets;
     private ProgressDialog saveExerciseDialog;
     private TextView warningMessage;
     private CheckBox cbExerciseComplete;
@@ -33,7 +33,8 @@ public class ExerciseInfoActivity extends AppCompatActivity {
     private JSONParser jsonParser;
     private SecurePreferences loginPrefs;
 
-    private double weight, reps;
+    private double weight;
+    private int reps, sets;
     private String currDate, exerciseName, username;
     private static String insertExerciseInfoUrl = "http://192.168.1.9:80/android_connect/insertExerciseInfo.php";
 
@@ -56,6 +57,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
 
         weight = 0;
         reps = 0;
+        sets = 0;
 
         cbExerciseComplete = (CheckBox) findViewById(R.id.cbExerciseComplete);
         cbExerciseComplete.setTextColor(Color.DKGRAY);
@@ -88,7 +90,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
                 weight -= 5;
                 if(weight < 0)
                     weight = 0;
-                etWeight.setText(""+weight);
+                etWeight.setText("" + weight);
             }
         });
 
@@ -112,14 +114,36 @@ public class ExerciseInfoActivity extends AppCompatActivity {
             }
         });
 
+        bPlusSets = (Button) findViewById(R.id.bPlusSets);
+        bPlusSets.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sets += 1;
+                etSets.setText(""+sets);
+            }
+        });
+
+        bMinusSets = (Button) findViewById(R.id.bMinusSets);
+        bMinusSets.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reps -= 1;
+                if(reps < 0)
+                    reps = 0;
+                etSets.setText(""+sets);
+            }
+        });
+
         bClearExerciseInput = (Button) findViewById(R.id.bClearExerciseInput);
         bClearExerciseInput.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 weight = 0;
                 reps = 0;
+                sets = 0;
                 etWeight.setText("");
                 etReps.setText("");
+                etSets.setText("");
                 cbExerciseComplete.setChecked(false);
             }
         });
@@ -127,19 +151,21 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         etWeight = (EditText) findViewById(R.id.etWeight);
         etWeight.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String text = s.toString();
-                if(text.length() > 0)
+                if (text.length() > 0)
                     weight = Double.parseDouble(text);
                 else
                     weight = 0;
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         etReps = (EditText) findViewById(R.id.etReps);
@@ -151,9 +177,27 @@ public class ExerciseInfoActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String text = s.toString();
                 if(text.length() > 0)
-                    reps = Double.parseDouble(text);
+                    reps = Integer.parseInt(text);
                 else
                     reps = 0;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        etSets = (EditText) findViewById(R.id.etSets);
+        etSets.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String text = s.toString();
+                if(text.length() > 0)
+                    sets = Integer.parseInt(text);
+                else
+                    sets = 0;
             }
 
             @Override
@@ -192,6 +236,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
                 params.put("exercise_name", exerciseName);
                 params.put("weight", "" + weight);
                 params.put("reps", "" + reps);
+                params.put("sets", "" + sets);
                 params.put("exercise_complete", isExerciseComplete);
                 params.put("date", currDate);
                 params.put("username", username);

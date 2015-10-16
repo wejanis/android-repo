@@ -5,17 +5,15 @@
     android:orientation="vertical" >
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/content"
+        android:id="@+id/lvExerciseSets"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="5dp"
-        android:background="@android:color/transparent"
-        android:cacheColorHint="@android:color/transparent"
         android:divider="#CCCCCC"
-        android:dividerHeight="1dp"
-        android:paddingLeft="2dp" >
+        android:dividerHeight="1dp">
+
     </ListView>
+
+
 
     <TextView style="?android:textAppearanceMedium"
         android:layout_width="wrap_content"
@@ -32,7 +30,9 @@
         android:id="@+id/ivAddExercise"
         android:clickable="true"/>
 
-    <TextView android:text="Add Exercise"
+    <TextView
+        android:id="@+id/tvAddExercise"
+        android:text="Add Exercise"
         android:layout_below="@+id/ivAddExercise"
         android:layout_centerInParent="true"
         android:layout_height="wrap_content"

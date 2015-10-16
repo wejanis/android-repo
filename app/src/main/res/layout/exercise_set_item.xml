@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="6dip">
+
+    <CheckBox
+        android:id="@+id/cbIsComplete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text="Complete"
+        android:textColor="@android:color/holo_blue_dark"
+        android:buttonTint="@android:color/darker_gray"
+        />
+
+    <TextView
+        android:id="@+id/exerciseSetName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text="Main Text"
+        android:textColor="@android:color/holo_blue_dark"/>
+
+    <TextView
+        android:id="@+id/exerciseSetSubtext"
+        android:text="Subtext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/exerciseSetName"
+        android:ellipsize="marquee"
+        android:lines="2"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:textSize="12sp"
+        android:textColor="@android:color/holo_blue_dark"/>
+</RelativeLayout>

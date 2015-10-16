@@ -2,6 +2,7 @@ package com.wahnaton.testapp.testappli;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,6 +35,7 @@ public class JSONParser{
         HttpURLConnection urlConnection = null;
         String response ="";
         JSONObject jObj = null;
+
         // make HTTP request using POST method
         try {
             URL _url = new URL(url);
@@ -120,23 +122,20 @@ public class JSONParser{
                 throw new AssertionError("UTF-8 is unknown");
             }
         }
-
         return result.toString();
     }
 
     // function get json from url
     // by making HTTP GET  method
-    public JSONObject makeGetRequest(String url, LinkedHashMap<String, String> getDataParams) { //data params for the GET request
+    public JSONArray makeGetRequest(String url, LinkedHashMap<String, String> getDataParams) { //data params for the GET request
 
-        JSONObject jObj = null;
+        JSONArray jArray = null;
         String json = "";
         HttpURLConnection urlConnection = null;
 
         //make HTTP request using GET method
         try {
-
             url = url + "?" + formatRequestString(getDataParams);
-            System.out.println("GET string: " + url);
 
             URL _url = new URL(url);
             urlConnection = (HttpURLConnection) _url.openConnection();
@@ -158,25 +157,27 @@ public class JSONParser{
                 sb.append(current);
                 System.out.print(current);
             }
+            System.out.println();
             json = sb.toString();
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            urlConnection.disconnect();
         }
+        finally {
+            urlConnection.disconnect();
+    }
 
         // try parse the string to a JSON object
         try {
-            jObj = new JSONObject(json);
+            jArray = new JSONArray(json);
         } catch (JSONException e) {
             Log.e("JSON Parser", "Error parsing data " + e.toString());
         }
 
         // return JSON String
-        return jObj;
+        return jArray;
     }
 
 }

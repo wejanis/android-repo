@@ -20,10 +20,21 @@
         android:orderInCategory="200"/>
 
     <item
+        android:id="@+id/action_addexercise"
+        android:title=""
+        android:icon="@mipmap/ic_add_white"
+        app:showAsAction="always"
+        android:orderInCategory="300"
+        />
+
+
+    <item
         android:id="@+id/action_pickdate"
         android:title=""
         android:icon="@mipmap/ic_event_white"
         app:showAsAction="always"
-        android:orderInCategory="300"/>
+        android:orderInCategory="400"/>
+
+
 
 </menu>

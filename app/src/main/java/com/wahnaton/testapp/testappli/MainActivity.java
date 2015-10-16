@@ -25,10 +25,11 @@ public class MainActivity extends AppCompatActivity{
 
     private SecurePreferences loginPrefs;
     private SharedPreferences datePref;
-    private DateTime currentDay;
+    private DateTime currentDate;
     private ViewPager mPager;
     private DatePickerDialog.OnDateSetListener date;
     private static int NUM_PAGES = 5000;
+    private static int INITIAL_POSITION = NUM_PAGES / 2;
     private PagerTitleStrip pts;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +49,26 @@ public class MainActivity extends AppCompatActivity{
         loginPrefs = new SecurePreferences(this, "user-info", "randomTestingPurposesKey", true);
         datePref = getSharedPreferences("date-pref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = datePref.edit();
-        editor.clear();
-        editor.commit();
+
+       // if(datePref.getString("currDate", null).equals(null))
+       // {
+            currentDate = DateTime.now(TimeZone.getDefault());
+            editor.putString("currDate", currentDate.format("YYYY-MM-DD", Locale.getDefault()).toString());
+            editor.commit();
+            System.out.println("current day: " + currentDate.format("YYYY-MM-DD", Locale.getDefault()).toString());
+      //  }
+     //   else{
+
+       // }
 
         mPager = (ViewPager) findViewById(R.id.mPager);
         pts = (PagerTitleStrip) findViewById(R.id.tsPager);
         mPager.setAdapter(new ScreenSlidePagerAdapter(getResources(), getSupportFragmentManager()));
-        mPager.setCurrentItem(NUM_PAGES / 2, false);
+        mPager.setCurrentItem(INITIAL_POSITION, false);
         mPager.getAdapter().notifyDataSetChanged();
-        mPager.setOffscreenPageLimit(1);
+
+        //Keep some offscreen pages even when offscreen so they don't need to reload.
+        mPager.setOffscreenPageLimit(13);
 
         //Pagertitle strip by default shows the title of the previous fragment, the current fragment, and the next fragment
         //This setting causes only the primary fragment's title to be shown (aka shows only "Today" instead of "Yesterday     Today    Tomorrow"
@@ -65,24 +77,18 @@ public class MainActivity extends AppCompatActivity{
         String username = loginPrefs.getString("username");
         setTitle("Welcome, " + username + "!");
 
-        currentDay = DateTime.now(TimeZone.getDefault());
-
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                DateTime pagerdate = DateTime.now(TimeZone.getDefault());
-                currentDay = pagerdate.plusDays(position - (NUM_PAGES / 2));
-
-                //format for storage in DATE field in database (which stores dates as YYYY-MM-DD)
-                String currDate = currentDay.format("YYYY-MM-DD", Locale.getDefault()).toString();
-                SharedPreferences.Editor editor = datePref.edit();
-                editor.putString("currDate", currDate);
-                editor.commit();
-
+                currentDate = syncDate(position, currentDate);
+                storeCurrentDate(currentDate);
             }
 
             @Override
-            public void onPageSelected(int position) {}
+            public void onPageSelected(int position) {
+                currentDate = syncDate(position, currentDate);
+                storeCurrentDate(currentDate);
+            }
 
             @Override
             public void onPageScrollStateChanged(int state) {}
@@ -91,22 +97,55 @@ public class MainActivity extends AppCompatActivity{
         date = new DatePickerDialog.OnDateSetListener() {
           public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
           {
-              DateTime oldDate = currentDay;
+              DateTime oldDate = currentDate;
               DateTime datePicked = DateTime.forDateOnly(year, monthOfYear + 1, dayOfMonth);
               int numDaysFromNewDate = oldDate.numDaysFrom(datePicked);
-              currentDay = datePicked;
-              mPager.setCurrentItem(mPager.getCurrentItem() + numDaysFromNewDate);
+              currentDate = datePicked;
 
-              //format for storage in DATE field in database (which stores dates as YYYY-MM-DD)
-              String currDate = currentDay.format("YYYY-MM-DD", Locale.getDefault()).toString();
-              SharedPreferences.Editor editor = datePref.edit();
-              editor.putString("currDate", currDate);
-              editor.commit();
+              storeCurrentDate(currentDate);
+              mPager.setCurrentItem(mPager.getCurrentItem() + numDaysFromNewDate);
+              mPager.setSelected(true);
 
           }
         };
 
     }
+
+    public static DateTime syncDate(int position, DateTime dateToSync){
+
+        //Calculate the positional difference between the newly selected selected position and the default position (which is Today).
+        int positionDifference = position - (INITIAL_POSITION);
+
+        DateTime pagerdate = DateTime.now(TimeZone.getDefault());
+        dateToSync = pagerdate.plusDays(positionDifference);
+
+        return dateToSync;
+    }
+
+    public void storeCurrentDate(DateTime date){
+
+        //format to match the 'DATE' field in the SQL database (which stores dates as YYYY-MM-DD)
+        String currDate = date.format("YYYY-MM-DD", Locale.getDefault()).toString();
+
+        //Store the
+        SharedPreferences.Editor editor = datePref.edit();
+        editor.putString("currDate", currDate);
+        editor.commit();
+    }
+
+    public void clearAllPreferences(){
+        String rememberLogin = loginPrefs.getString("rememberLogin");
+
+        if(rememberLogin.equals("false")) {
+            loginPrefs.clear();
+        }
+
+        SharedPreferences.Editor editor = datePref.edit();
+        editor.clear();
+        editor.commit();
+    }
+
+
 
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
@@ -122,12 +161,7 @@ public class MainActivity extends AppCompatActivity{
                 return true;
             case R.id.action_logout:
                 startActivity(new Intent(this, LoginActivity.class));
-
-                //Clear the login credentials of the user since they didn't select "remember login"
-                String rememberLogin = loginPrefs.getString("rememberLogin");
-                if(rememberLogin.equals("false"))
-                    loginPrefs.clear();
-
+                clearAllPreferences();
                 finish();
                 //Activities aside from MainActivity need:
                 //Intent intent = new Intent(this, HomeActivity.class);
@@ -136,8 +170,11 @@ public class MainActivity extends AppCompatActivity{
                 //startActivity(intent);
                 //finish();
                 return true;
+            case R.id.action_addexercise:
+                startActivity(new Intent(MainActivity.this, AddExerciseActivity.class));
+                return true;
             case R.id.action_pickdate:
-                new DatePickerDialog(this, date, currentDay.getYear(), currentDay.getMonth()-1, currentDay.getDay()).show();
+                new DatePickerDialog(this, date, currentDate.getYear(), currentDate.getMonth()-1, currentDate.getDay()).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -148,7 +185,7 @@ public class MainActivity extends AppCompatActivity{
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        DateTime date;
+        DateTime titleDate;
 
         public ScreenSlidePagerAdapter(Resources resources, FragmentManager fm) {
             super(fm);
@@ -160,7 +197,7 @@ public class MainActivity extends AppCompatActivity{
 
         public Fragment getItem(int position){
 
-            return new ScreenSlidePageFragment().newInstance(date);
+            return new ScreenSlidePageFragment().newInstance();
         }
 
         @Override
@@ -168,18 +205,17 @@ public class MainActivity extends AppCompatActivity{
 
             CharSequence cs;
 
-            DateTime pagerdate = DateTime.now(TimeZone.getDefault());
-            int days = position - (NUM_PAGES / 2);
-            date = pagerdate.plusDays(days);
+            titleDate =  DateTime.now(TimeZone.getDefault());
+            titleDate = syncDate(position, titleDate);
 
-            if(position - (NUM_PAGES/2) == 0)
+            if(position - (INITIAL_POSITION) == 0)
                 cs = "Today";
-            else if (position - (NUM_PAGES/2) == 1)
+            else if (position - (INITIAL_POSITION) == 1)
                 cs = "Tomorrow";
-            else if (position - (NUM_PAGES/2) == -1)
+            else if (position - (INITIAL_POSITION) == -1)
                 cs = "Yesterday";
             else
-                cs = date.format("WWW, MM/DD/YYYY", Locale.getDefault()).toString();
+                cs = titleDate.format("WWW, MM/DD/YYYY", Locale.getDefault()).toString();
 
             return cs;
         }
@@ -192,9 +228,7 @@ public class MainActivity extends AppCompatActivity{
 
     public void onDestroy() {
         super.onDestroy();
-        String rememberLogin = loginPrefs.getString("rememberLogin");
-        if(rememberLogin.equals("false"))
-            loginPrefs.clear();
+        clearAllPreferences();
     }
 
 

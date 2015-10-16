@@ -11,14 +11,15 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Weight (lbs)"
-        android:textSize="25sp"
+        android:textSize="20sp"
         android:paddingTop="20dp"
         android:paddingLeft="10dp"
-        android:paddingBottom="5dp"/>
+        android:paddingBottom="3dp"/>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
 
         <Button
             android:id="@+id/bMinusWeight"
@@ -26,15 +27,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="-"
-            android:textSize="40sp"/>
+            android:textSize="30sp"/>
 
         <EditText
             android:id="@+id/etWeight"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="10"
+            android:layout_weight="6"
             android:gravity="center"
-            android:textSize="30dp"
+            android:textSize="20dp"
             android:text=""
             android:inputType="numberDecimal"
             />
@@ -45,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="+"
-            android:textSize="40sp"/>
+            android:textSize="30sp"/>
 
     </LinearLayout>
 
@@ -55,16 +56,17 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Reps"
-        android:textSize="25sp"
-        android:paddingTop="50dp"
+        android:textSize="20sp"
+        android:paddingTop="30dp"
         android:paddingLeft="10dp"
-        android:paddingBottom="5dp"
+        android:paddingBottom="3dp"
         />
 
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
 
         <Button
             android:id="@+id/bMinusReps"
@@ -72,15 +74,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="-"
-            android:textSize="40sp"/>
+            android:textSize="30sp"/>
 
         <EditText
             android:id="@+id/etReps"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="10"
+            android:layout_weight="6"
             android:text=""
-            android:textSize="30dp"
+            android:textSize="20dp"
             android:gravity="center"
             android:inputType="number"
             />
@@ -91,20 +93,69 @@
             android:layout_height="wrap_content"
             android:text="+"
             android:layout_weight="1"
-            android:textSize="40sp"/>
+            android:textSize="30sp"/>
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tvSets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Sets"
+        android:textSize="20sp"
+        android:paddingTop="30dp"
+        android:paddingLeft="10dp"
+        android:paddingBottom="3dp"
+        />
+
+    <LinearLayout
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingBottom="10dp"
+        >
+
+        <Button
+            android:id="@+id/bMinusSets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="-"
+            android:textSize="30sp"/>
+
+        <EditText
+            android:id="@+id/etSets"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="6"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:inputType="number"
+            />
+
+        <Button
+            android:id="@+id/bPlusSets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:layout_weight="1"
+            android:textSize="30sp"/>
+
+    </LinearLayout>
+
+
+
     <CheckBox
         android:id="@+id/cbExerciseComplete"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="105dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Exercise complete"
-        android:textSize="20dp"
-        android:paddingLeft="5dp"
+        android:textSize="15dp"
         android:textStyle="normal"
+        android:textColor="#757575"
         />
 
     <LinearLayout
@@ -120,7 +171,7 @@
             android:text="Save"/>
 
         <android.support.v4.widget.Space
-            android:layout_width="10dp"
+            android:layout_width="15dp"
             android:layout_height="0dp" />
 
         <Button
@@ -129,6 +180,8 @@
             android:layout_height="wrap_content"
             android:text="Clear"/>
     </LinearLayout>
+
+
 
     <TextView
         android:id="@+id/tvWarningMessage"

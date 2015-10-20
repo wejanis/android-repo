@@ -44,8 +44,8 @@ public class JSONParser{
             urlConnection = (HttpURLConnection) _url.openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
-            urlConnection.setReadTimeout(15000);
-            urlConnection.setConnectTimeout(15000);
+            urlConnection.setReadTimeout(5000);
+            urlConnection.setConnectTimeout(5000);
             urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             urlConnection.setRequestMethod("POST");
             urlConnection.setUseCaches(false);
@@ -140,8 +140,8 @@ public class JSONParser{
             URL _url = new URL(url);
             urlConnection = (HttpURLConnection) _url.openConnection();
             urlConnection.setDoInput(true);
-            urlConnection.setReadTimeout(15000);
-            urlConnection.setConnectTimeout(15000);
+            urlConnection.setReadTimeout(5000);
+            urlConnection.setConnectTimeout(5000);
             urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             urlConnection.setRequestMethod("GET");
             urlConnection.setUseCaches(true);

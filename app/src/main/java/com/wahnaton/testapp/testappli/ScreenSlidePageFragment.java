@@ -11,9 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -21,7 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class ScreenSlidePageFragment extends Fragment implements View.OnClickListener{
@@ -30,16 +27,15 @@ public class ScreenSlidePageFragment extends Fragment implements View.OnClickLis
     private ImageView ivAddExercise;
     private TextView tvAddExercise;
     private ListView lvExerciseSets;
-    private ListAdapter exerciseSetAdapter;
+    private WorkoutAdapter adapter;
     private ProgressDialog pDialog;
 
     private String username;
     private String currDate;
-    private String exercise_complete;
     private boolean areExercisesLoaded = false;
 
     JSONParser jParser = new JSONParser();
-    ArrayList<HashMap<String, String>> exerciseNames;
+    ArrayList<ExerciseSetModel> exerciseSets;
     LoadUserExerciseSets sets;
 
     // JSON Node names
@@ -55,8 +51,7 @@ public class ScreenSlidePageFragment extends Fragment implements View.OnClickLis
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_screen_slide_page, container, false);
 
-        exerciseNames = new ArrayList<HashMap<String, String>>();
-        //areExercisesLoaded = false;
+        exerciseSets = new ArrayList<ExerciseSetModel>();
 
         tvEmpty = (TextView) rootView.findViewById(android.R.id.empty);
         ivAddExercise = (ImageView) rootView.findViewById(R.id.ivAddExercise);
@@ -119,39 +114,30 @@ public class ScreenSlidePageFragment extends Fragment implements View.OnClickLis
             LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
             params.put("username", username);
             params.put("exercise_date", currDate);
-            System.out.println("date: " + currDate);
-            System.out.println("passed in url" + exerciseDataUrl);
 
-            JSONArray exerciseSets = jParser.makeGetRequest(exerciseDataUrl, params);
+            JSONArray jsonData = jParser.makeGetRequest(exerciseDataUrl, params);
+            System.out.println("jsondata " + jsonData.toString());
 
             try {
                 // looping through exercise sets
-                for (int i = 0; i < exerciseSets.length(); i++) {
-                    HashMap<String, String> map = new HashMap<String, String>();
-                    JSONObject c = exerciseSets.getJSONObject(i);
-                    System.out.println(c.toString());
+                for (int i = 0; i < jsonData.length(); i++) {
 
-                    int sets = Integer.parseInt(c.getString("sets"));
+                    JSONObject c = jsonData.getJSONObject(i);
+                    System.out.println("JSON OBJECT: " + c.toString() + "!!!!");
 
-                    for(int j = 0; j < sets; j++) {
-                        // Storing each json item in variable
-                        String exercise_name = c.getString("exercise_name");
-                        String weight = c.getString("weight");
-                        String reps = c.getString("reps");
+                    int exerciseId = Integer.parseInt(c.getString("id"));
+                    String exerciseName = c.getString("exercise_name");
+                    String weight = c.getString("weight");
+                    String reps = c.getString("reps");
+                    int exerciseComplete = Integer.parseInt(c.getString("exercise_complete"));
 
-                        exercise_complete = c.getString("exercise_complete");
+                    String exerciseDetails = weight + "lbs, " + reps + " rep(s)";
 
-                        String subText = weight + "lbs, " + reps + " rep(s)";
-                        System.out.println("subtext: " + subText);
+                    ExerciseSetModel set = new ExerciseSetModel(exerciseId, exerciseName, exerciseDetails, exerciseComplete);
+                    //System.out.println(set.toString());
 
-                        map.put(TAG_EXERCISE_NAME, exercise_name);
-                        map.put(TAG_SUBTEXT, subText);
-                        exerciseNames.add(map);
-                    }
-
+                    exerciseSets.add(set);
                 }
-                System.out.println("hashmap: " + exerciseNames.toString());
-
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -163,16 +149,14 @@ public class ScreenSlidePageFragment extends Fragment implements View.OnClickLis
         protected void onPostExecute(String file_url) {
             pDialog.dismiss();
 
-            if(exerciseNames.size() > 3){
+            if(exerciseSets.size() > 3){
                 ivAddExercise.setVisibility(View.GONE);
                 tvAddExercise.setVisibility(View.GONE);
             }
 
-            exerciseSetAdapter = new SimpleAdapter(getActivity().getApplicationContext(), exerciseNames,
-                    R.layout.exercise_set_item, new String[] { TAG_EXERCISE_NAME, TAG_SUBTEXT},
-                    new int[] { R.id.exerciseSetName, R.id.exerciseSetSubtext});
+            adapter = new WorkoutAdapter(getActivity().getApplicationContext(), exerciseSets);
 
-            lvExerciseSets.setAdapter(exerciseSetAdapter);
+            lvExerciseSets.setAdapter(adapter);
         }
 
     }

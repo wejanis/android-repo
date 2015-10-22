@@ -24,7 +24,6 @@ import hirondelle.date4j.DateTime;
 public class MainActivity extends AppCompatActivity{
 
     private SecurePreferences loginPrefs;
-    private SharedPreferences datePref;
     private DateTime currentDate;
     private ViewPager mPager;
     private DatePickerDialog.OnDateSetListener date;
@@ -46,21 +45,6 @@ public class MainActivity extends AppCompatActivity{
             return;
         }
 
-        loginPrefs = new SecurePreferences(this, "user-info", "randomTestingPurposesKey", true);
-        datePref = getSharedPreferences("date-pref", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = datePref.edit();
-
-       // if(datePref.getString("currDate", null).equals(null))
-       // {
-            currentDate = DateTime.now(TimeZone.getDefault());
-            editor.putString("currDate", currentDate.format("YYYY-MM-DD", Locale.getDefault()).toString());
-            editor.commit();
-            System.out.println("current day: " + currentDate.format("YYYY-MM-DD", Locale.getDefault()).toString());
-      //  }
-     //   else{
-
-       // }
-
         mPager = (ViewPager) findViewById(R.id.mPager);
         pts = (PagerTitleStrip) findViewById(R.id.tsPager);
         mPager.setAdapter(new ScreenSlidePagerAdapter(getResources(), getSupportFragmentManager()));
@@ -73,6 +57,30 @@ public class MainActivity extends AppCompatActivity{
         //Pagertitle strip by default shows the title of the previous fragment, the current fragment, and the next fragment
         //This setting causes only the primary fragment's title to be shown (aka shows only "Today" instead of "Yesterday     Today    Tomorrow"
         pts.setNonPrimaryAlpha(0);
+
+        loginPrefs = new SecurePreferences(this, "user-info", "randomTestingPurposesKey", true);
+
+        currentDate = DateTime.now(TimeZone.getDefault());
+
+        //Handles returning back to the correct date from the ExerciseInfo Activity
+        if(getIntent().hasExtra("currDate")){
+
+            String intentDate = getIntent().getStringExtra("currDate");
+            DateTime referenceDate = currentDate;
+            DateTime storedDate = new DateTime(intentDate);
+            int numDaysFromNewDate = referenceDate.numDaysFrom(storedDate);
+            currentDate = storedDate;
+
+            storeCurrentDate(currentDate);
+            mPager.setCurrentItem(mPager.getCurrentItem() + numDaysFromNewDate);
+            mPager.setSelected(true);
+
+        }
+        //default date on app powerup is today.
+        else {
+            storeCurrentDate(currentDate);
+        }
+
 
         String username = loginPrefs.getString("username");
         setTitle("Welcome, " + username + "!");
@@ -97,9 +105,9 @@ public class MainActivity extends AppCompatActivity{
         date = new DatePickerDialog.OnDateSetListener() {
           public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
           {
-              DateTime oldDate = currentDate;
+              DateTime referenceDate = currentDate;
               DateTime datePicked = DateTime.forDateOnly(year, monthOfYear + 1, dayOfMonth);
-              int numDaysFromNewDate = oldDate.numDaysFrom(datePicked);
+              int numDaysFromNewDate = referenceDate.numDaysFrom(datePicked);
               currentDate = datePicked;
 
               storeCurrentDate(currentDate);
@@ -128,6 +136,7 @@ public class MainActivity extends AppCompatActivity{
         String currDate = date.format("YYYY-MM-DD", Locale.getDefault()).toString();
 
         //Store the
+        SharedPreferences datePref = getSharedPreferences("date-pref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = datePref.edit();
         editor.putString("currDate", currDate);
         editor.commit();
@@ -140,6 +149,7 @@ public class MainActivity extends AppCompatActivity{
             loginPrefs.clear();
         }
 
+        SharedPreferences datePref = getSharedPreferences("date-pref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = datePref.edit();
         editor.clear();
         editor.commit();

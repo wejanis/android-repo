@@ -53,6 +53,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         currDate = datePref.getString("currDate", "Date not found.");
         setTitle(exerciseName + " on " + currDate);
 
+
         jsonParser = new JSONParser();
 
         weight = 0;
@@ -127,9 +128,9 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         bMinusSets.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reps -= 1;
-                if(reps < 0)
-                    reps = 0;
+                sets -= 1;
+                if(sets < 0)
+                    sets = 0;
                 etSets.setText(""+sets);
             }
         });
@@ -251,6 +252,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
                         // successfully added data
                         Intent i = new Intent(getApplicationContext(), MainActivity.class);
                         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        i.putExtra("currDate", currDate);
                         startActivity(i);
                         finish();
                     } else {

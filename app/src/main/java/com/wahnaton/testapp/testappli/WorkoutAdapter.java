@@ -68,40 +68,22 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
                         exerciseSetList.get(position).setIsComplete(1);
                         exerciseId = exerciseSetList.get(position).getExerciseId() + "";
                         isComplete = "1";
-                        //System.out.println("checked! " + "iscomplete = " + isComplete);
                     } else {
                         exerciseSetList.get(position).setIsComplete(0);
                         exerciseId = exerciseSetList.get(position).getExerciseId() + "";
                         isComplete = "0";
-                        //System.out.println("unchecked! " + "iscomplete = " + isComplete);
                     }
                     new UpdateExerciseComplete().execute();
                 }
             });
 
-//            holder.cbIsComplete.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (isChecked) {
-//                        exerciseSetList.get(position).setIsComplete(1);
-//                        exerciseId = exerciseSetList.get(position).getExerciseId() + "";
-//                        isComplete = "1";
-//                        System.out.println("checked! " + "iscomplete = " + isComplete);
-//                    } else {
-//                        exerciseSetList.get(position).setIsComplete(0);
-//                        isComplete = "0";
-//                        System.out.println("unchecked! " + "iscomplete = " + isComplete);
-//                    }
-//                    new UpdateExerciseComplete().execute();
-//                }
-//            });
+            holder.tvExerciseSetName.setText(exerciseSetList.get(position).getExerciseName());
+            holder.tvExerciseSetDetails.setText(exerciseSetList.get(position).getExerciseDetails() + " id: " + exerciseSetList.get(position).getExerciseId());
+
         }
         else{
             holder = (ViewHolder) view.getTag();
         }
-
-        holder.tvExerciseSetName.setText(exerciseSetList.get(position).getExerciseName());
-        holder.tvExerciseSetDetails.setText(exerciseSetList.get(position).getExerciseDetails() + " id: " + exerciseSetList.get(position).getExerciseId());
 
         return view;
     }

@@ -71,7 +71,8 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         bSaveExercise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new SaveExercise().execute();
+                boolean isChecked = cbExerciseComplete.isChecked();
+                new SaveExercise(isChecked).execute();
             }
         });
 
@@ -209,7 +210,12 @@ public class ExerciseInfoActivity extends AppCompatActivity {
 
     class SaveExercise extends AsyncTask<String, String, String> {
 
-        boolean emptyFieldError;
+        private boolean emptyFieldError;
+        private boolean isChecked;
+
+        public SaveExercise(boolean isChecked){
+            this.isChecked = isChecked;
+        }
 
         protected void onPreExecute(){
             super.onPreExecute();
@@ -230,7 +236,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
             else {
 
                 String isExerciseComplete = "false";
-                if(cbExerciseComplete.isChecked())
+                if(isChecked)
                     isExerciseComplete = "true";
 
                 LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();

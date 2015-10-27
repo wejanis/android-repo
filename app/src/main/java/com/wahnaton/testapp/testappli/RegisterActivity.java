@@ -47,7 +47,11 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.bRegister:
-                new AddUser().execute();
+                String name = etName.getText().toString();
+                String username = etUsername.getText().toString();
+                String password = etPassword.getText().toString();
+                String verifypassword = etVerifyPassword.getText().toString();
+                new AddUser(name, username, password, verifypassword).execute();
                 break;
         }
     }
@@ -55,6 +59,16 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
     class AddUser extends AsyncTask<String, String, String> {
 
         boolean passwordError, usernameError, userNameSizeError, passwordSizeError;
+        private String name, username, password, verifypassword;
+
+        public AddUser(String name, String username, String password, String verifypassword) {
+
+            this.name = name;
+            this.username = username;
+            this.password = password;
+            this.verifypassword = verifypassword;
+        }
+
 
         protected void onPreExecute(){
             super.onPreExecute();
@@ -71,10 +85,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
             usernameError = false;
             userNameSizeError = false;
             passwordSizeError = false;
-            String name = etName.getText().toString();
-            String username = etUsername.getText().toString();
-            String password = etPassword.getText().toString();
-            String verifypassword = etVerifyPassword.getText().toString();
+
 
             if(name.length() < 1 || username.length() < 1)
                 userNameSizeError = true;

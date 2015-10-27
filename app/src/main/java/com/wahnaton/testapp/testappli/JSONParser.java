@@ -98,33 +98,6 @@ public class JSONParser{
 
     }
 
-    //Formats and encodes the string for the GET/POST request
-    private static String formatRequestString(LinkedHashMap<String, String> params){
-
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-        for(Map.Entry<String, String> entry : params.entrySet())
-        {
-            if(first)
-                first = false;
-            else
-                result.append("&");
-
-            try {
-                result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                throw new AssertionError("UTF-8 is unknown");
-            }
-            result.append("=");
-            try {
-                result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                throw new AssertionError("UTF-8 is unknown");
-            }
-        }
-        return result.toString();
-    }
-
     // function get json from url
     // by making HTTP GET  method
     public JSONArray makeGetRequest(String url, LinkedHashMap<String, String> getDataParams) { //data params for the GET request
@@ -178,6 +151,33 @@ public class JSONParser{
 
         // return JSON String
         return jArray;
+    }
+
+    //Formats and encodes the string for the GET/POST request
+    private static String formatRequestString(LinkedHashMap<String, String> params){
+
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for(Map.Entry<String, String> entry : params.entrySet())
+        {
+            if(first)
+                first = false;
+            else
+                result.append("&");
+
+            try {
+                result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new AssertionError("UTF-8 is unknown");
+            }
+            result.append("=");
+            try {
+                result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new AssertionError("UTF-8 is unknown");
+            }
+        }
+        return result.toString();
     }
 
 }

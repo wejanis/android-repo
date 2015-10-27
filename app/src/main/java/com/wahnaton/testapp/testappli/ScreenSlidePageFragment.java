@@ -36,7 +36,6 @@ public class ScreenSlidePageFragment extends Fragment{
     private String username;
     private String currDate;
     private boolean areExercisesLoaded = false;
-    private int deleteId;
 
     JSONParser jParser = new JSONParser();
     ArrayList<ExerciseSetModel> exerciseSets;
@@ -80,7 +79,6 @@ public class ScreenSlidePageFragment extends Fragment{
 
                 AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
                 adb.setTitle("What would you like to do?");
-                final int positionToRemove = position;
 
                 CharSequence options[] = new CharSequence[] {"Update", "Copy", "Delete", "Cancel"};
 
@@ -88,23 +86,23 @@ public class ScreenSlidePageFragment extends Fragment{
                     public void onClick(DialogInterface dialog, int which) {
 
                         switch(which){
+
                             //Update
                             case 0:
+                                //int updateId = exerciseSets.get(position).getExerciseId();
+
                                 break;
+
                             //Copy
                             case 1:
+                                int copyId = exerciseSets.get(position).getExerciseId();
+                                new CopyExercise(copyId, position).execute();
                                 break;
+
                             //Delete
                             case 2:
-                                deleteId = exerciseSets.get(position).getExerciseId();
-                                exerciseSets.remove(position);
-                                new RemoveExercise().execute();
-                                adapter.notifyDataSetChanged();
-
-                                if (exerciseSets.size() < 4) {
-                                    ivAddExercise.setVisibility(View.VISIBLE);
-                                    tvAddExercise.setVisibility(View.VISIBLE);
-                                }
+                                int deleteId = exerciseSets.get(position).getExerciseId();
+                                new RemoveExercise(deleteId, position).execute();
                                 break;
                             default:
                                 break;
@@ -130,11 +128,15 @@ public class ScreenSlidePageFragment extends Fragment{
         }
     }
 
-    class RemoveExercise extends AsyncTask<String, String, String> {
+    private class RemoveExercise extends AsyncTask<String, String, String> {
 
-        private String removeExerciseUrl;
-        private SecurePreferences loginPrefs;
-        private SharedPreferences datePref;
+        private int deleteId;
+        private int deletePosition;
+
+        public RemoveExercise(int deleteId, int deletePosition) {
+            this.deleteId = deleteId;
+            this.deletePosition = deletePosition;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -143,11 +145,48 @@ public class ScreenSlidePageFragment extends Fragment{
 
         protected String doInBackground(String... args) {
 
-            removeExerciseUrl = "http://192.168.1.9:80/android_connect/removeExercise.php";
+            String removeExerciseUrl = "http://192.168.1.9:80/android_connect/removeExercise.php";
 
             LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
             params.put("delete_id", deleteId + "");
             jParser.makePostRequest(removeExerciseUrl, params);
+            exerciseSets.remove(deletePosition);
+
+
+            return null;
+        }
+
+        protected void onPostExecute(String file_url) {
+            if (exerciseSets.size() < 4) {
+                ivAddExercise.setVisibility(View.VISIBLE);
+                tvAddExercise.setVisibility(View.VISIBLE);
+            }
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    private class UpdateExercise extends AsyncTask<String, String, String> {
+
+        private int updateId;
+        private int updatePosition;
+
+        public UpdateExercise(int updateId, int updatePosition){
+            this.updateId = updateId;
+            this.updatePosition = updatePosition;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected String doInBackground(String... args) {
+
+            String updateExerciseUrl = "http://192.168.1.9:80/android_connect/updateExercise.php";
+
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("update_id", updateId + "");
+            jParser.makePostRequest(updateExerciseUrl, params);
 
             return null;
         }
@@ -156,7 +195,57 @@ public class ScreenSlidePageFragment extends Fragment{
         }
     }
 
-    class LoadUserExerciseSets extends AsyncTask<String, String, String> {
+    private class CopyExercise extends AsyncTask<String, String, String> {
+
+        private int copyId;
+        private int copyPosition;
+
+        public CopyExercise(int copyId, int copyPosition){
+            this.copyId = copyId;
+            this.copyPosition = copyPosition;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected String doInBackground(String... args) {
+
+            String copyExerciseUrl = "http://192.168.1.9:80/android_connect/copyExercise.php";
+
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("copy_id", copyId + "");
+            JSONObject json = jParser.makePostRequest(copyExerciseUrl, params);
+
+            String nameToCopy = exerciseSets.get(copyPosition).getExerciseName();
+            String detailsToCopy = exerciseSets.get(copyPosition).getExerciseDetails();
+            int isCompleteCopy = exerciseSets.get(copyPosition).getIsComplete();
+
+            try {
+                //the new exercise set has it's own unique id in the database separate from the one it copied.
+                int newId = json.getInt("new_id");
+                ExerciseSetModel copy = new ExerciseSetModel(newId, nameToCopy, detailsToCopy, isCompleteCopy);
+                exerciseSets.add(copy);
+
+            }
+            catch (JSONException e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(String file_url) {
+            if (exerciseSets.size() > 3) {
+                ivAddExercise.setVisibility(View.GONE);
+                tvAddExercise.setVisibility(View.GONE);
+            }
+            adapter.notifyDataSetChanged();
+
+        }
+    }
+
+    private class LoadUserExerciseSets extends AsyncTask<String, String, String> {
 
         private String exerciseDataUrl;
         private SecurePreferences loginPrefs;

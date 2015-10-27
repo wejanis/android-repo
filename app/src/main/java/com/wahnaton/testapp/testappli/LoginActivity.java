@@ -76,7 +76,11 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
         switch(v.getId()){
             case R.id.bLogin:
-                new ValidateUser().execute();
+                String username = etUsername.getText().toString();
+                String password = etPassword.getText().toString();
+                boolean isChecked = cbRememberLogin.isChecked();
+
+                new ValidateUser(username, password, isChecked).execute();
                 break;
 
             case R.id.tvResgisterLink:
@@ -89,6 +93,15 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     class ValidateUser extends AsyncTask<String, String, String> {
 
         boolean passwordError, usernameError, userNameSizeError, passwordSizeError;
+        private String username;
+        private String password;
+        private boolean isChecked;
+
+        public ValidateUser(String username, String password, boolean isChecked){
+            this.username = username;
+            this.password = password;
+            this.isChecked = isChecked;
+        }
 
         protected void onPreExecute(){
             super.onPreExecute();
@@ -106,8 +119,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             usernameError = false;
             userNameSizeError = false;
             passwordSizeError = false;
-            String username = etUsername.getText().toString();
-            String password = etPassword.getText().toString();
 
             if(username.length() < 1)
                 userNameSizeError = true;
@@ -128,7 +139,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
                         loginPrefs.put("username", username);
                         loginPrefs.put("password", password);
-                        if(cbRememberLogin.isChecked())
+                        if(isChecked)
                             loginPrefs.put("rememberLogin", "true");
                         else
                             //dont clear preferences here because the username is used throughout the app

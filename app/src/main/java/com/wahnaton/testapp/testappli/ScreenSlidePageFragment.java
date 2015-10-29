@@ -9,11 +9,16 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -53,7 +58,7 @@ public class ScreenSlidePageFragment extends Fragment{
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_screen_slide_page, container, false);
 
-        exerciseSets = new ArrayList<ExerciseSetModel>();
+        exerciseSets = new ArrayList<>();
 
         tvEmpty = (TextView) rootView.findViewById(android.R.id.empty);
         ivAddExercise = (ImageView) rootView.findViewById(R.id.ivAddExercise);
@@ -79,7 +84,6 @@ public class ScreenSlidePageFragment extends Fragment{
 
                 AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
                 adb.setTitle("What would you like to do?");
-
                 CharSequence options[] = new CharSequence[] {"Update", "Copy", "Delete", "Cancel"};
 
                 adb.setItems(options, new AlertDialog.OnClickListener() {
@@ -89,7 +93,90 @@ public class ScreenSlidePageFragment extends Fragment{
 
                             //Update
                             case 0:
-                                //int updateId = exerciseSets.get(position).getExerciseId();
+                                dialog.dismiss();
+                                final int updateId = exerciseSets.get(position).getExerciseId();
+                                final String oldWeight = exerciseSets.get(position).getWeight();
+                                final String oldReps = exerciseSets.get(position).getReps();
+
+                                LinearLayout layout = new LinearLayout(getActivity());
+                                layout.setOrientation(LinearLayout.VERTICAL);
+
+                                final EditText etWeight = new EditText(getActivity());
+                                etWeight.setHint("Weight");
+                                etWeight.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                etWeight.addTextChangedListener(new TextWatcher() {
+                                    @Override
+                                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                                    }
+
+                                    @Override
+                                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                        String text = s.toString();
+                                        if (text.length() > 0) {
+                                            exerciseSets.get(position).setWeight(text);
+                                            //System.out.println(exerciseSets.get(position).getWeight());
+                                        } else {
+                                            exerciseSets.get(position).setWeight(oldWeight);
+                                            //System.out.println(exerciseSets.get(position).getWeight());
+                                        }
+                                    }
+
+                                    @Override
+                                    public void afterTextChanged(Editable s) {
+                                    }
+                                });
+                                layout.addView(etWeight);
+
+                                final EditText etReps = new EditText(getActivity());
+                                etReps.setHint("Reps");
+                                etReps.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                etReps.addTextChangedListener(new TextWatcher() {
+                                    @Override
+                                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                                    }
+
+                                    @Override
+                                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                        String text = s.toString();
+                                        if (text.length() > 0) {
+                                            exerciseSets.get(position).setReps(text);
+                                            //System.out.println(exerciseSets.get(position).getReps());
+                                        } else {
+                                            exerciseSets.get(position).setReps(oldReps);
+                                            //System.out.println(exerciseSets.get(position).getReps());
+                                        }
+                                    }
+
+                                    @Override
+                                    public void afterTextChanged(Editable s) {
+                                    }
+                                });
+                                layout.addView(etReps);
+
+                                final AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+
+                                alert.setTitle("Update your exercise");
+                                alert.setView(layout);
+
+                                alert.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        final String newWeight = exerciseSets.get(position).getWeight();
+                                        final String newReps = exerciseSets.get(position).getReps();
+                                        exerciseSets.get(position).setExerciseDetails(newWeight, newReps);
+                                        new UpdateExercise(updateId, position, newWeight, newReps).execute();
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                });
+
+                                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                                alert.show();
 
                                 break;
 
@@ -145,9 +232,9 @@ public class ScreenSlidePageFragment extends Fragment{
 
         protected String doInBackground(String... args) {
 
-            String removeExerciseUrl = "http://192.168.1.9:80/android_connect/removeExercise.php";
+            String removeExerciseUrl = "http://192.168.1.12:80/android_connect/removeExercise.php";
 
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            LinkedHashMap<String, String> params = new LinkedHashMap<>();
             params.put("delete_id", deleteId + "");
             jParser.makePostRequest(removeExerciseUrl, params);
             exerciseSets.remove(deletePosition);
@@ -169,10 +256,14 @@ public class ScreenSlidePageFragment extends Fragment{
 
         private int updateId;
         private int updatePosition;
+        private String weight;
+        private String reps;
 
-        public UpdateExercise(int updateId, int updatePosition){
+        public UpdateExercise(int updateId, int updatePosition, String weight, String reps){
             this.updateId = updateId;
             this.updatePosition = updatePosition;
+            this.weight = weight;
+            this.reps = reps;
         }
 
         @Override
@@ -182,10 +273,12 @@ public class ScreenSlidePageFragment extends Fragment{
 
         protected String doInBackground(String... args) {
 
-            String updateExerciseUrl = "http://192.168.1.9:80/android_connect/updateExercise.php";
+            String updateExerciseUrl = "http://192.168.1.12:80/android_connect/updateExercise.php";
 
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            LinkedHashMap<String, String> params = new LinkedHashMap<>();
             params.put("update_id", updateId + "");
+            params.put("weight", weight);
+            params.put("reps", reps);
             jParser.makePostRequest(updateExerciseUrl, params);
 
             return null;
@@ -212,20 +305,21 @@ public class ScreenSlidePageFragment extends Fragment{
 
         protected String doInBackground(String... args) {
 
-            String copyExerciseUrl = "http://192.168.1.9:80/android_connect/copyExercise.php";
+            String copyExerciseUrl = "http://192.168.1.12:80/android_connect/copyExercise.php";
 
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            LinkedHashMap<String, String> params = new LinkedHashMap<>();
             params.put("copy_id", copyId + "");
             JSONObject json = jParser.makePostRequest(copyExerciseUrl, params);
 
             String nameToCopy = exerciseSets.get(copyPosition).getExerciseName();
-            String detailsToCopy = exerciseSets.get(copyPosition).getExerciseDetails();
+            String weight = exerciseSets.get(copyPosition).getWeight();
+            String reps = exerciseSets.get(copyPosition).getReps();
             int isCompleteCopy = exerciseSets.get(copyPosition).getIsComplete();
 
             try {
                 //the new exercise set has it's own unique id in the database separate from the one it copied.
                 int newId = json.getInt("new_id");
-                ExerciseSetModel copy = new ExerciseSetModel(newId, nameToCopy, detailsToCopy, isCompleteCopy);
+                ExerciseSetModel copy = new ExerciseSetModel(newId, nameToCopy, weight, reps, isCompleteCopy);
                 exerciseSets.add(copy);
 
             }
@@ -263,7 +357,7 @@ public class ScreenSlidePageFragment extends Fragment{
 
         protected String doInBackground(String... args) {
 
-            exerciseDataUrl = "http://192.168.1.9:80/android_connect/getUserData.php";
+            exerciseDataUrl = "http://192.168.1.12:80/android_connect/getUserData.php";
 
             loginPrefs = new SecurePreferences(getActivity().getApplicationContext(), "user-info", "randomTestingPurposesKey", true);
             username = loginPrefs.getString("username");
@@ -271,7 +365,7 @@ public class ScreenSlidePageFragment extends Fragment{
             datePref = getActivity().getSharedPreferences("date-pref", Context.MODE_PRIVATE);
             currDate = datePref.getString("currDate", "Date not found.");
 
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            LinkedHashMap<String, String> params = new LinkedHashMap<>();
             params.put("username", username);
             params.put("exercise_date", currDate);
 
@@ -290,9 +384,7 @@ public class ScreenSlidePageFragment extends Fragment{
                     String reps = c.getString("reps");
                     int exerciseComplete = Integer.parseInt(c.getString("exercise_complete"));
 
-                    String exerciseDetails = weight + "lbs, " + reps + " rep(s)";
-
-                    ExerciseSetModel set = new ExerciseSetModel(exerciseId, exerciseName, exerciseDetails, exerciseComplete);
+                    ExerciseSetModel set = new ExerciseSetModel(exerciseId, exerciseName, weight, reps, exerciseComplete);
                     //System.out.println(set.toString());
 
                     exerciseSets.add(set);

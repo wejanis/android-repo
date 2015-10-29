@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 public class RegisterActivity extends Activity implements View.OnClickListener {
 
     private ProgressDialog registerDialog;
-    private static String addUserUrl = "http://192.168.1.9:80/android_connect/addUser.php";
     JSONParser jsonParser = new JSONParser();
 
 
@@ -58,7 +57,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
 
     class AddUser extends AsyncTask<String, String, String> {
 
-        boolean passwordError, usernameError, userNameSizeError, passwordSizeError;
+        private boolean passwordError, usernameError, userNameSizeError, passwordSizeError;
         private String name, username, password, verifypassword;
 
         public AddUser(String name, String username, String password, String verifypassword) {
@@ -81,6 +80,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
         }
 
         protected String doInBackground(String... args) {
+            String addUserUrl = "http://192.168.1.12:80/android_connect/addUser.php";
             passwordError= false;
             usernameError = false;
             userNameSizeError = false;
@@ -94,7 +94,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
             else if(!password.equals(verifypassword))
                 passwordError = true;
             else {
-                LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+                LinkedHashMap<String, String> params = new LinkedHashMap<>();
                 params.put("name", name);
                 params.put("username", username);
                 params.put("password", password);

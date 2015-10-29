@@ -36,7 +36,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
     private double weight;
     private int reps, sets;
     private String currDate, exerciseName, username;
-    private static String insertExerciseInfoUrl = "http://192.168.1.9:80/android_connect/insertExerciseInfo.php";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -231,15 +231,16 @@ public class ExerciseInfoActivity extends AppCompatActivity {
 
             emptyFieldError = false;
 
-            if(etWeight.equals("") || etReps.equals("") || weight == 0 || reps == 0)
+            if(weight == 0 || reps == 0 || sets == 0)
                 emptyFieldError = true;
             else {
 
+                String insertExerciseInfoUrl = "http://192.168.1.12:80/android_connect/insertExerciseInfo.php";
                 String isExerciseComplete = "false";
                 if(isChecked)
                     isExerciseComplete = "true";
 
-                LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+                LinkedHashMap<String, String> params = new LinkedHashMap<>();
                 params.put("exercise_name", exerciseName);
                 params.put("weight", "" + weight);
                 params.put("reps", "" + reps);

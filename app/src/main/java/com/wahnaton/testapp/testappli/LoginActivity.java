@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 public class LoginActivity extends Activity implements View.OnClickListener {
 
     private ProgressDialog loginDialog;
-    private static String userLoginUrl = "http://192.168.1.9:80/android_connect/userLogin.php";
     private String rememberLogin;
 
     private JSONParser jsonParser = new JSONParser();
@@ -92,7 +91,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     class ValidateUser extends AsyncTask<String, String, String> {
 
-        boolean passwordError, usernameError, userNameSizeError, passwordSizeError;
+        private boolean passwordError, usernameError, userNameSizeError, passwordSizeError;
         private String username;
         private String password;
         private boolean isChecked;
@@ -115,6 +114,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         }
 
         protected String doInBackground(String... args) {
+
+            String userLoginUrl = "http://192.168.1.12:80/android_connect/userLogin.php";
             passwordError= false;
             usernameError = false;
             userNameSizeError = false;
@@ -125,12 +126,13 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             else if(password.length() < 6)
                 passwordSizeError = true;
             else {
-                LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+                LinkedHashMap<String, String> params = new LinkedHashMap<>();
                 params.put("username", username);
                 params.put("password", password);
 
+
                 JSONObject json = jsonParser.makePostRequest(userLoginUrl, params);
-                //Log.d("JSON Parser", json.toString());
+                //System.out.println("json string: " + json.toString());
 
                 // check for success tag
                 try {

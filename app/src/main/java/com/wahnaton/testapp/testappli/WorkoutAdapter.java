@@ -42,7 +42,7 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
     public View getView(final int position, View convertView, ViewGroup parent) {
 
         RelativeLayout view = (RelativeLayout) convertView;
-        ViewHolder holder = null;
+        ViewHolder holder;
 
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -52,6 +52,7 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
             holder.tvExerciseSetName = (TextView) view.findViewById(R.id.exerciseSetName);
             holder.tvExerciseSetDetails = (TextView) view.findViewById(R.id.exerciseSetDetails);
             holder.cbIsComplete = (CheckBox) view.findViewById(R.id.cbIsComplete);
+            view.setTag(holder);
         }
         else{
             holder = (ViewHolder) view.getTag();
@@ -100,9 +101,9 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
 
         protected String doInBackground(String... args) {
 
-            updateIsCompleteUrl = "http://192.168.1.9:80/android_connect/updateIsComplete.php";
+            updateIsCompleteUrl = "http://192.168.1.12:80/android_connect/updateIsComplete.php";
 
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            LinkedHashMap<String, String> params = new LinkedHashMap<>();
             params.put("is_complete", isComplete);
             params.put("exercise_id", exerciseId);
             jParser.makePostRequest(updateIsCompleteUrl, params);

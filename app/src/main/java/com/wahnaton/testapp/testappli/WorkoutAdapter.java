@@ -14,7 +14,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-
+/*
+    The WorkoutAdapter class is a custom adapter that is based off of array adapter.
+    This custom adapter maps data from an array of ExerciseSetModel objects.
+ */
 public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
 
     private Context context;
@@ -32,6 +35,8 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
         isComplete = "";
     }
 
+    //Use the viewholder pattern to help speed up rendering of ListView.
+    // Helps with handling the recyling of views when scrolling a list.
     private class ViewHolder{
         TextView tvExerciseSetName;
         TextView tvExerciseSetDetails;
@@ -45,6 +50,8 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
         ViewHolder holder;
 
         if (view == null) {
+
+            //Setup the view if it is null and tag it.
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = (RelativeLayout) inflater.inflate(R.layout.exercise_set_item, parent, false);
 
@@ -58,6 +65,7 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
             holder = (ViewHolder) view.getTag();
         }
 
+        //When loading each item, see if the checkbox should have a checkmark or not.
         if (exerciseSetList.get(position).getIsComplete() == 1) {
             holder.cbIsComplete.setChecked(true);
             isComplete = "1";
@@ -70,11 +78,19 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
         holder.cbIsComplete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                //When checked, update the exercise set list model and grab the id
+                // of the list item that was clicked.  Flag the isComplete as 1.
+                // (isComplete can only be stored inthe db as 0 or 1.)
                 if (isChecked) {
                     exerciseSetList.get(position).setIsComplete(1);
                     exerciseId = exerciseSetList.get(position).getExerciseId() + "";
                     isComplete = "1";
-                } else {
+                }
+
+                // When unchecked, udpate the exercise set list model, grab the id of the list
+                // item that was clicked and flag the isComplete as 0.
+                else {
                     exerciseSetList.get(position).setIsComplete(0);
                     exerciseId = exerciseSetList.get(position).getExerciseId() + "";
                     isComplete = "0";
@@ -83,6 +99,7 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
             }
         });
 
+        //Load and display the information from the model to the user.
         holder.tvExerciseSetName.setText(exerciseSetList.get(position).getExerciseName());
         holder.tvExerciseSetDetails.setText(exerciseSetList.get(position).getExerciseDetails() + " id: " + exerciseSetList.get(position).getExerciseId());
 
@@ -90,6 +107,11 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
         return view;
     }
 
+    /*
+        When the user clicks the 'Complete' checkbox, this background task is executed
+        and sends a post request to the server letting it know to update the completion
+        information in the database.
+     */
     class UpdateExerciseComplete extends AsyncTask<String, String, String> {
 
         private String updateIsCompleteUrl;
@@ -104,6 +126,8 @@ public class WorkoutAdapter extends ArrayAdapter<ExerciseSetModel> {
             updateIsCompleteUrl = "http://192.168.1.12:80/android_connect/updateIsComplete.php";
 
             LinkedHashMap<String, String> params = new LinkedHashMap<>();
+
+            //Let the server know the id and completion status of the exercise to udpate.
             params.put("is_complete", isComplete);
             params.put("exercise_id", exerciseId);
             jParser.makePostRequest(updateIsCompleteUrl, params);

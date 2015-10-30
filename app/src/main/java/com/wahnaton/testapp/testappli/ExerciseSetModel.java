@@ -1,5 +1,11 @@
 package com.wahnaton.testapp.testappli;
 
+/*
+    The Exercise Set model stores information about each exercise the user inputs.
+    It's main use in this program is to wrap json data from database queries into
+    an object.
+ */
+
 public class ExerciseSetModel {
 
     private int exerciseId;
@@ -17,6 +23,8 @@ public class ExerciseSetModel {
         this.reps = reps;
         this.isComplete = isComplete;
 
+        //Exercise details combines the exercise weight and reps into one string
+        // so that it can be display in just one text view instead of two separate ones.
         exerciseDetails = weight + "lbs, " + reps + " rep(s)";
     }
 

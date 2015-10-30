@@ -67,6 +67,9 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         warningMessage = (TextView) findViewById(R.id.tvWarningMessage);
         warningMessage.setTextColor(Color.RED);
 
+        //TODO: Needs to be refactored. Instead of each one getting it's own onclick/ontextchange, have
+        //TODO: the activity implement those two interfaces, the do a switch(getID)/case for each view.
+
         bSaveExercise = (Button) findViewById(R.id.bSaveExercise);
         bSaveExercise.setOnClickListener(new View.OnClickListener() {
             @Override

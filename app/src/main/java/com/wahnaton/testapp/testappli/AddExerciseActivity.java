@@ -12,6 +12,10 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+/*
+    The Add Exercise Activity allows the user to select which exercise
+    was completed from a list. Also allows for filtering based on text input.
+ */
 
 public class AddExerciseActivity extends Activity {
 
@@ -24,9 +28,15 @@ public class AddExerciseActivity extends Activity {
         setContentView(R.layout.activity_add_exercise);
         setTitle("");
 
+        //The list of exercise is hardcoded for test purposes right now. In the future,
+        //the list would be read from a file to be easily modifiable.
         String[] exercises = {"Bicep curls", "Bench Press", "Squats", "Deadlifts"};
+
+        //Adapter maps each exercise to an item in the list view.
         exerciseAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, exercises);
 
+        //When a user clicks on an exercise in the list, this activity sends
+        //the exercise name to the Exercise Info activity.
         exerciseListView = (ListView) findViewById(android.R.id.list);
         exerciseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -41,8 +51,8 @@ public class AddExerciseActivity extends Activity {
         });
         exerciseListView.setAdapter(exerciseAdapter);
 
+        //Filters the text in the listview based on user input in the search field.
         etSearch = (EditText) findViewById(R.id.etSearch);
-
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}

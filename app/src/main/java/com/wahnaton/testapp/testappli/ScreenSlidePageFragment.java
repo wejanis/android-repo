@@ -255,13 +255,11 @@ public class ScreenSlidePageFragment extends Fragment{
     private class UpdateExercise extends AsyncTask<String, String, String> {
 
         private int updateId;
-        private int updatePosition;
         private String weight;
         private String reps;
 
         public UpdateExercise(int updateId, int updatePosition, String weight, String reps){
             this.updateId = updateId;
-            this.updatePosition = updatePosition;
             this.weight = weight;
             this.reps = reps;
         }

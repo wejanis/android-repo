@@ -29,6 +29,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+/*
+    The ScreenSlidePageFragment class represents all the functionality for interacting with
+    exercise information. These fragments are contained on the view pager on the main activity.
+
+ */
+
 public class ScreenSlidePageFragment extends Fragment{
 
     private TextView tvEmpty;
@@ -61,6 +67,9 @@ public class ScreenSlidePageFragment extends Fragment{
         exerciseSets = new ArrayList<>();
 
         tvEmpty = (TextView) rootView.findViewById(android.R.id.empty);
+
+        //Each fragment contains an addexercise button so the user can add an exercise
+        // to that specific day.
         ivAddExercise = (ImageView) rootView.findViewById(R.id.ivAddExercise);
         ivAddExercise.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,10 +98,15 @@ public class ScreenSlidePageFragment extends Fragment{
                 adb.setItems(options, new AlertDialog.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
+                        // When an exercise is long clicked, the user gets 4 options: Update, Copy,
+                        // Delete or Cancel.
                         switch(which){
 
                             //Update
                             case 0:
+
+                                //If the user wants to update a new dialog appears and the old one
+                                // is dismissed.
                                 dialog.dismiss();
                                 final int updateId = exerciseSets.get(position).getExerciseId();
                                 final String oldWeight = exerciseSets.get(position).getWeight();
@@ -101,6 +115,7 @@ public class ScreenSlidePageFragment extends Fragment{
                                 LinearLayout layout = new LinearLayout(getActivity());
                                 layout.setOrientation(LinearLayout.VERTICAL);
 
+                                //Set up the view for the weight field in the update dialog
                                 final EditText etWeight = new EditText(getActivity());
                                 etWeight.setHint("Weight");
                                 etWeight.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -127,6 +142,7 @@ public class ScreenSlidePageFragment extends Fragment{
                                 });
                                 layout.addView(etWeight);
 
+                                //Set up the view for the reps field in the update dialog
                                 final EditText etReps = new EditText(getActivity());
                                 etReps.setHint("Reps");
                                 etReps.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -158,6 +174,8 @@ public class ScreenSlidePageFragment extends Fragment{
                                 alert.setTitle("Update your exercise");
                                 alert.setView(layout);
 
+                                // If the user chooses to update, the update background task will
+                                // execute and update the database with the new information.
                                 alert.setPositiveButton("Update", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -169,9 +187,13 @@ public class ScreenSlidePageFragment extends Fragment{
                                     }
                                 });
 
+                                //If the user cancels, the original information will be loaded
+                                //into the model.
                                 alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
+                                        exerciseSets.get(position).setWeight(oldWeight);
+                                        exerciseSets.get(position).setReps(oldReps);
                                         dialog.dismiss();
                                     }
                                 });
@@ -197,7 +219,6 @@ public class ScreenSlidePageFragment extends Fragment{
                     }
                 });
                 adb.show();
-
                 return true;
             }
         });
@@ -206,6 +227,8 @@ public class ScreenSlidePageFragment extends Fragment{
     }
 
     @Override
+    // Makes sure that when the fragment is visible it loads the exercise information. If the
+    // information has already been loaded before, there is no need to reload it.
     public void setUserVisibleHint(boolean isVisibleToUser) {
 
         super.setUserVisibleHint(isVisibleToUser);
@@ -215,6 +238,11 @@ public class ScreenSlidePageFragment extends Fragment{
         }
     }
 
+    /*
+        RemoveExercise is a background task that task that executes when a user long clicks
+        an exercise on the main activity and selects "Remove" from the alert dialog. It removes
+        the exercise from the database as well as the view model.
+     */
     private class RemoveExercise extends AsyncTask<String, String, String> {
 
         private int deleteId;
@@ -244,6 +272,9 @@ public class ScreenSlidePageFragment extends Fragment{
         }
 
         protected void onPostExecute(String file_url) {
+
+            // Displays the Add exercise button in the fragment if there are fewer than
+            // 4 exercises.
             if (exerciseSets.size() < 4) {
                 ivAddExercise.setVisibility(View.VISIBLE);
                 tvAddExercise.setVisibility(View.VISIBLE);
@@ -252,6 +283,11 @@ public class ScreenSlidePageFragment extends Fragment{
         }
     }
 
+    /*
+    UpdateExercise is a background task that task that executes when a user long clicks
+    an exercise on the main activity and selects "Update" from the alert dialog. It updates
+    the exercise in the database as well as the model with the information the user provides
+     */
     private class UpdateExercise extends AsyncTask<String, String, String> {
 
         private int updateId;
@@ -286,6 +322,11 @@ public class ScreenSlidePageFragment extends Fragment{
         }
     }
 
+    /*
+        CopyExercise is a background task that task that executes when a user long clicks
+        an exercise on the main activity and selects "Copy" from the alert dialog. It copies
+        the exercise and creates a new row in the database and new item in the model.
+     */
     private class CopyExercise extends AsyncTask<String, String, String> {
 
         private int copyId;
@@ -328,6 +369,9 @@ public class ScreenSlidePageFragment extends Fragment{
         }
 
         protected void onPostExecute(String file_url) {
+
+            // If there are more than 3 exercises, the add exercise button in the fragment
+            // is hidden.
             if (exerciseSets.size() > 3) {
                 ivAddExercise.setVisibility(View.GONE);
                 tvAddExercise.setVisibility(View.GONE);
@@ -337,6 +381,10 @@ public class ScreenSlidePageFragment extends Fragment{
         }
     }
 
+    /*
+        When a new fragment is loaded on the view pager on the main activity, the exercise sets
+        for that user are loaded and adapted to a list view that is on each page.
+     */
     private class LoadUserExerciseSets extends AsyncTask<String, String, String> {
 
         private String exerciseDataUrl;
@@ -347,7 +395,7 @@ public class ScreenSlidePageFragment extends Fragment{
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(getActivity());
-            pDialog.setMessage("Loading products. Please wait...");
+            pDialog.setMessage("Loading exercises. Please wait...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
@@ -355,6 +403,7 @@ public class ScreenSlidePageFragment extends Fragment{
 
         protected String doInBackground(String... args) {
 
+            //Makes a post request to the server giving the username and current date
             exerciseDataUrl = "http://192.168.1.12:80/android_connect/getUserData.php";
 
             loginPrefs = new SecurePreferences(getActivity().getApplicationContext(), "user-info", "randomTestingPurposesKey", true);
@@ -367,11 +416,12 @@ public class ScreenSlidePageFragment extends Fragment{
             params.put("username", username);
             params.put("exercise_date", currDate);
 
+            //The server responds with any exercise set information in the form of a JSONArray.
             JSONArray jsonData = jParser.makeGetRequest(exerciseDataUrl, params);
             //System.out.println("jsondata " + jsonData.toString());
 
             try {
-                // looping through exercise sets
+                // looping through exercise sets from the json response
                 for (int i = 0; i < jsonData.length(); i++) {
 
                     JSONObject c = jsonData.getJSONObject(i);
@@ -382,6 +432,8 @@ public class ScreenSlidePageFragment extends Fragment{
                     String reps = c.getString("reps");
                     int exerciseComplete = Integer.parseInt(c.getString("exercise_complete"));
 
+                    // Each json object gets molded into an exercise set model which will be adapted onto the listview
+                    // on the main activity.
                     ExerciseSetModel set = new ExerciseSetModel(exerciseId, exerciseName, weight, reps, exerciseComplete);
                     //System.out.println(set.toString());
 
@@ -403,8 +455,8 @@ public class ScreenSlidePageFragment extends Fragment{
                 tvAddExercise.setVisibility(View.GONE);
             }
 
+            //Adapts the information in the exercise sets model to the listview.
             adapter = new WorkoutAdapter(getActivity().getApplicationContext(), exerciseSets);
-
             lvExerciseSets.setAdapter(adapter);
         }
     }
